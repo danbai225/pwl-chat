@@ -7,12 +7,13 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.danbai225.pwlchat.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.danbai225.pwlchat.services.MyProjectService"/>
-    </extensions>
+        <toolWindow id="myToolWindowFactory"
+                    anchor="right"
+                    factoryClass="com.github.danbai225.pwlchat.factory.ToolWindowFactory"
+        />
+ </extensions>
 
     <applicationListeners>
-        <listener class="com.github.danbai225.pwlchat.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
+
     </applicationListeners>
 </idea-plugin>
