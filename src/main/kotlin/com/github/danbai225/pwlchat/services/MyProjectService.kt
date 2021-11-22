@@ -1,7 +1,7 @@
-package org.jetbrains.plugins.template.services
+package com.github.danbai225.pwlchat.services
 
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.template.MyBundle
+import com.github.danbai225.pwlchat.MyBundle
 
 class MyProjectService(project: Project) {
 
