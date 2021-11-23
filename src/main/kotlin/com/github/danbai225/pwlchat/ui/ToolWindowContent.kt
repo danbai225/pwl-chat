@@ -1,41 +1,40 @@
 package com.github.danbai225.pwlchat.ui
 
-import com.intellij.ui.jcef.JBCefApp
 import com.intellij.ui.jcef.JBCefBrowser
 import java.awt.BorderLayout
 import javax.swing.*
-import kotlin.concurrent.thread
 
 
 class ToolWindowContent{
-    /**
-     * 返回创建的JPanel
-     * @return JPanel
-     */
-    var root: JPanel?=null
-    var web: JPanel?=null
-    var content: JPanel?=null
-    var contentPanel: JPanel?=null
-    var chatSp: JScrollPane?=null
-    var input: JTextArea?=null
-    var send: JButton?=null
-    /**
-     * 构造函数
-     */
+    var root: JPanel?=JPanel(BorderLayout())
+    var send: JButton?=JButton("发送")
+    var pan:JTextArea?=JTextArea()
+    val browser: JBCefBrowser=JBCefBrowser()
     init {
-        content= JPanel(BorderLayout())
-        if (!JBCefApp.isSupported()) {
-            content!!.add(JLabel("当前环境不支持JCEF", SwingConstants.CENTER))
-        } else {
-            var jbCefBrowser = JBCefBrowser()
-            content!!.add(jbCefBrowser.component,BorderLayout.CENTER)
-            jbCefBrowser?.loadURL("123")
-        }
-
+        root?.add(centerContent(), BorderLayout.NORTH)
+        root?.add(inputControl(),BorderLayout.SOUTH)
+        //browser.loadURL("https://p00q.cn")
+       // browser.openDevtools()
         send?.addActionListener {
             println("123")
-            //jbCefBrowser?.loadURL("123")
-            //textPane?.text = "123"
+
         }
+    }
+    fun getContent(): JComponent? {
+        return root
+    }
+    private fun inputControl(): JPanel {
+        val panel = JPanel()
+        panel.layout = BorderLayout()
+        pan?.text="123"
+        panel.add(pan,BorderLayout.WEST)
+        panel.add(send,BorderLayout.EAST)
+        return panel
+    }
+    private fun centerContent(): JPanel {
+        val panel = JPanel()
+        panel.layout = BorderLayout()
+        panel.add(browser.component, BorderLayout.CENTER)
+        return panel
     }
 }

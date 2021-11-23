@@ -1,17 +1,15 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.danbai225.pwlchat</id>
-    <name>pwl-chat</name>
-    <vendor>danbai225</vendor>
-
+    <name>Pwl-Chat</name>
+    <vendor email="danbai@88.com" url="https://p00q.cn">DanBai</vendor>
     <depends>com.intellij.modules.platform</depends>
-
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="myToolWindowFactory"
                     anchor="right"
                     factoryClass="com.github.danbai225.pwlchat.factory.ToolWindowFactory"
-        />
- </extensions>
+                    icon="/images/logo.png"/>
+    </extensions>
 
     <applicationListeners>
 
