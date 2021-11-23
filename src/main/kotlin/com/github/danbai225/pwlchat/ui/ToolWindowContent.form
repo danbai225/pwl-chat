@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.github.danbai225.pwlchat.ui.ToolWindowContent">
+  <grid id="27dc6" binding="root" layout-manager="BorderLayout" hgap="0" vgap="0">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties>
+      <toolTipText value=""/>
+    </properties>
+    <border type="none" title="PWL" title-justification="2">
+      <font/>
+    </border>
+    <children>
+      <grid id="d434c" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="Center"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <scrollpane id="f5e3d" binding="consoleScroll">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
+                <constraints/>
+                <properties>
+                  <text value=""/>
+                </properties>
+                <clientProperties>
+                  <charset class="java.lang.String" value=""/>
+                  <html.disable class="java.lang.Boolean" value="false"/>
+                </clientProperties>
+              </component>
+            </children>
+          </scrollpane>
+        </children>
+      </grid>
+      <grid id="be9e1" layout-manager="BorderLayout" hgap="0" vgap="0">
+        <constraints border-constraint="South"/>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="ec629" class="javax.swing.JButton" binding="send">
+            <constraints border-constraint="East"/>
+            <properties>
+              <text value="Button"/>
+            </properties>
+          </component>
+          <scrollpane id="65177">
+            <constraints border-constraint="Center"/>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="51506" class="javax.swing.JTextArea" binding="iChat">
+                <constraints/>
+                <properties>
+                  <lineWrap value="false"/>
+                  <text value=""/>
+                  <toolTipText value=""/>
+                </properties>
+              </component>
+            </children>
+          </scrollpane>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

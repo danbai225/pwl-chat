@@ -51,7 +51,13 @@ qodana {
     saveReport.set(true)
     showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
 }
-
+dependencies {
+    implementation("org.java-websocket:Java-WebSocket:1.5.2")
+    implementation("org.slf4j:slf4j-simple:1.7.25")
+    implementation("com.google.code.gson:gson:2.8.5")
+    implementation("org.jsoup:jsoup:1.14.2")
+    implementation("com.squareup.okhttp3:okhttp:3.14.4")
+}
 tasks {
     // Set the JVM compatibility versions
     properties("javaVersion").let {
