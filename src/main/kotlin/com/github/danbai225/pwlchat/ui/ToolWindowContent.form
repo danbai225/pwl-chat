@@ -24,6 +24,7 @@
               <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
                 <constraints/>
                 <properties>
+                  <editable value="false"/>
                   <text value=""/>
                 </properties>
                 <clientProperties>
