@@ -2,13 +2,8 @@ package com.github.danbai225.pwlchat.ui
 
 import com.github.danbai225.pwlchat.client.Client
 import com.intellij.openapi.ui.Messages
-import java.awt.Image
-import java.awt.Toolkit
-import java.awt.datatransfer.DataFlavor
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.io.File
-import java.lang.Exception
 import javax.swing.*
 
 

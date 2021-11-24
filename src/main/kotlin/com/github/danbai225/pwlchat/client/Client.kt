@@ -2,10 +2,13 @@ package com.github.danbai225.pwlchat.client
 
 import com.github.danbai225.pwlchat.pj.Liveness
 import com.github.danbai225.pwlchat.pj.Msg
+import com.github.danbai225.pwlchat.pj.RedPack
 import com.github.danbai225.pwlchat.pj.loginInfo
 import com.google.gson.Gson
 import com.intellij.ide.util.PropertiesComponent
 import com.jetbrains.rd.util.use
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.*
 import org.freedesktop.Hexdump.toHex
 import org.java_websocket.client.WebSocketClient
@@ -18,9 +21,11 @@ import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.swing.JButton
 import javax.swing.JScrollBar
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
+import kotlin.collections.ArrayList
 
 
 val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
@@ -35,7 +40,7 @@ class Client : WebSocketClient {
     var password: String? = ""
     var islogin: Boolean = false
     var liveness = 0.0
-
+    var pklist:ArrayList<String> =ArrayList()
     constructor(draft: Draft?) : super(URI.create(PWL_WSS), draft) {}
     constructor() : super(URI.create(PWL_WSS)) {
         //加载数据
@@ -97,8 +102,20 @@ class Client : WebSocketClient {
             Gson().fromJson(message, Msg::class.java)
         when (msg.type) {
             "msg" -> {
-                val doc: Document = Jsoup.parse(msg.content)
-                addMsgToOChat(doc.text(), msg.userName)
+                if (msg.content.indexOf("\"msgType\":\"redPacket\"")>0){
+                    //红包消息
+                    val red =
+                        Gson().fromJson(msg.content, RedPack::class.java)
+                    msg.oId?.let { pklist.add(it) }
+                    addMsgToOChat(red.msg+"(🧧红包消息)", msg.userName)
+                }else{
+                    val doc: Document = Jsoup.parse(msg.content)
+                    var m=doc.text()
+                    if (m.length==0){
+                        m="(表情.jpg)"
+                    }
+                    addMsgToOChat(m, msg.userName)
+                }
             }
             "online" -> {
                 online = msg.onlineChatCnt
@@ -128,12 +145,24 @@ class Client : WebSocketClient {
         consoleScroll?.updateUI()
     }
 
-    fun sendMsg(mgs: String) {
+    fun sendMsg(msg: String) {
+        if (msg.isEmpty()){
+            return
+        }
         val call = post(
             PWL_SEND,
-            "{\"content\":\"$mgs\"}"
+            "{\"content\":\"$msg\"}"
         )
         call?.execute().use {}
+        if(pklist.size>0){
+            val selectedSeries = pklist.toMutableList()
+            pklist.clear()
+            GlobalScope.launch {
+                selectedSeries.forEach {
+                    post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute()
+                }
+            }
+        }
     }
 
     fun post(url: String, json: String): Call? {
@@ -186,6 +215,7 @@ class Client : WebSocketClient {
         private const val PWL_LOGIN = "https://pwl.icu/login"
         private const val PWL_LIVE = "https://pwl.icu/user/liveness"
         private const val PWL_SEND = "https://pwl.icu/chat-room/send"
+        private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
     }
 
 }

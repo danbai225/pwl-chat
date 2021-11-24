@@ -8,16 +8,13 @@ import com.intellij.ui.content.ContentManager
 
 class ToolWindowFactory : ToolWindowFactory {
    override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
-        // 此处方法将会在点击ToolWindow的时候触发
-        // 获取ContentManager
         val contentManager: ContentManager = toolWindow.contentManager
-        val labelContent: Content = contentManager.factory // 内容管理器获取工厂类
-            .createContent( // 创建Content（组件类实例、显示名称、是否可以锁定）
+        val labelContent: Content = contentManager.factory
+            .createContent(
                 ToolWindowContent().getContent(),
-                "MyTab",
+                "DebugCommandLine",
                 false
             )
-        // 利用ContentManager添加Content
         contentManager.addContent(labelContent)
     }
 }

@@ -3,12 +3,17 @@
     <id>com.github.danbai225.pwlchat</id>
     <name>Pwl-Chat</name>
     <vendor email="danbai@88.com" url="https://p00q.cn">DanBai</vendor>
+
+    <description><![CDATA[
+    摸鱼派：pwl.icu.<br>
+    <h3>IDEA聊天插件</h3>
+    凑字数凑字数凑字数凑字数凑字数凑字数凑字数凑字数凑字数凑字数凑字数凑字数
+    ]]></description>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="myToolWindowFactory"
-                    anchor="right"
-                    factoryClass="com.github.danbai225.pwlchat.factory.ToolWindowFactory"
-                    icon="/images/logo.png"/>
+        <toolWindow id="PWL"
+                    anchor="bottom"
+                    factoryClass="com.github.danbai225.pwlchat.factory.ToolWindowFactory"/>
     </extensions>
 
     <applicationListeners>
