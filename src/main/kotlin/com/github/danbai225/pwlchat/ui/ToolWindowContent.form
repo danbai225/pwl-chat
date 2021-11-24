@@ -44,7 +44,7 @@
           <component id="ec629" class="javax.swing.JButton" binding="send">
             <constraints border-constraint="East"/>
             <properties>
-              <text value="Button"/>
+              <text value="Login"/>
             </properties>
           </component>
           <scrollpane id="65177">

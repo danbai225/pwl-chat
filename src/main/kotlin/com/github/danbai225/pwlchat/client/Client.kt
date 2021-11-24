@@ -10,12 +10,13 @@ import com.jetbrains.rd.util.use
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
-import org.freedesktop.Hexdump.toHex
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.drafts.Draft
 import org.java_websocket.handshake.ServerHandshake
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.ByteBuffer
 import java.security.MessageDigest
@@ -29,7 +30,7 @@ import javax.swing.JTextPane
 
 val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
 val client = OkHttpClient()
-
+val logger = LoggerFactory.getLogger(Client::class.java)
 class Client : WebSocketClient {
     var cookie: String? = ""
     var oChat: JTextPane? = null
@@ -40,12 +41,12 @@ class Client : WebSocketClient {
     var islogin: Boolean = false
     var liveness = 0.0
     var pklist:ArrayList<String> =ArrayList()
+    var numberOfReconnections=0
     constructor(draft: Draft?) : super(URI.create(PWL_WSS), draft) {}
     constructor() : super(URI.create(PWL_WSS)) {
         //加载数据
         load()
     }
-
     private fun md5(input: String?): String? {
         if (input == null || input.length == 0) {
             return null
@@ -102,11 +103,17 @@ class Client : WebSocketClient {
     }
 
     override fun onOpen(handshakedata: ServerHandshake) {
-        println("new connection opened")
+        logger.info("new connection opened")
+        numberOfReconnections=0
     }
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
-        println("closed with exit code $code additional info: $reason")
+        logger.info("closed with exit code $code additional info: $reason")
+        if(numberOfReconnections<MAX_R){
+            numberOfReconnections++
+            Thread.sleep((numberOfReconnections*1500).toLong())
+            connect()
+        }
     }
 
     override fun onMessage(message: String) {
@@ -138,11 +145,11 @@ class Client : WebSocketClient {
     }
 
     override fun onMessage(message: ByteBuffer) {
-        println("received ByteBuffer")
+        logger.info("received ByteBuffer")
     }
 
     override fun onError(ex: Exception) {
-        System.err.println("an error occurred:$ex")
+        logger.error("an error occurred:$ex")
     }
 
     fun addMsgToOChat(msg: String?, UserName: String?) {
@@ -159,6 +166,9 @@ class Client : WebSocketClient {
     }
 
     fun sendMsg(msg: String) {
+        if(isClosed){
+            connect()
+        }
         if (msg.isEmpty()){
             return
         }
@@ -229,6 +239,7 @@ class Client : WebSocketClient {
         private const val PWL_LIVE = "https://pwl.icu/user/liveness"
         private const val PWL_SEND = "https://pwl.icu/chat-room/send"
         private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
+        private const val MAX_R = 15
     }
 
 }
