@@ -116,7 +116,7 @@ class Client : WebSocketClient {
     }
 
     override fun onMessage(message: String) {
-        //println("received message: $message")
+        println("received message: $message")
         val msg =
             Gson().fromJson(message, Msg::class.java)
         when (msg.type) {
@@ -140,14 +140,8 @@ class Client : WebSocketClient {
                 online = msg.onlineChatCnt
             }
             //抢红包消息
-            ""->{
-                val red =
-                    Gson().fromJson(msg.content, RedPack::class.java)
-                red.who?.forEach {
-                    if (it.userName==userName){
-                        addInfoToOChat("openPacket","抢到了${red.info?.userName}的红包，${it.userMoney}$")
-                    }
-                }
+            "redPacketStatus"->{
+                addInfoToOChat("openPacket","${msg.whoGot}抢到了${msg.whoGive}的红包")
             }
         }
 
@@ -184,7 +178,11 @@ class Client : WebSocketClient {
         consoleScroll?.updateUI()
     }
     fun packet(count:Int,money: Int,msg: String){
-        sendMsg("[redpacket]{\"money\":\"$money\",\"count\":\"$count\",\"msg\":\"$msg\"}[/redpacket]")
+        var mm=msg
+        if (msg.isEmpty()){
+            mm="摸鱼红包"
+        }
+        sendMsg("[redpacket]{\\\"money\\\":\\\"$money\\\",\\\"count\\\":\\\"$count\\\",\\\"msg\\\":\\\"$mm\\\"}[/redpacket]")
     }
     fun sendMsg(msg: String) {
         if(isClosed){
