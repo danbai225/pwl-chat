@@ -139,6 +139,16 @@ class Client : WebSocketClient {
             "online" -> {
                 online = msg.onlineChatCnt
             }
+            //抢红包消息
+            ""->{
+                val red =
+                    Gson().fromJson(msg.content, RedPack::class.java)
+                red.who?.forEach {
+                    if (it.userName==userName){
+                        addInfoToOChat("openPacket","抢到了${red.info?.userName}的红包，${it.userMoney}$")
+                    }
+                }
+            }
         }
 
     }
@@ -157,13 +167,25 @@ class Client : WebSocketClient {
         gotoConsoleLow()
     }
 
+    fun addErrToOChat(op: String?, msg: String?) {
+        val time = SimpleDateFormat("HH:mm:ss").format(Date())
+        oChat?.text += "[Err-$time] $op: $msg\n"
+        gotoConsoleLow()
+    }
+    fun addInfoToOChat(op: String?, msg: String?) {
+        val time = SimpleDateFormat("HH:mm:ss").format(Date())
+        oChat?.text += "[Info-$time] $op: $msg\n"
+        gotoConsoleLow()
+    }
     @Synchronized
     fun gotoConsoleLow() {
         val scrollBar: JScrollBar = consoleScroll?.verticalScrollBar!!
         scrollBar.value = scrollBar.maximum
         consoleScroll?.updateUI()
     }
-
+    fun packet(count:Int,money: Int,msg: String){
+        sendMsg("[redpacket]{\"money\":\"$money\",\"count\":\"$count\",\"msg\":\"$msg\"}[/redpacket]")
+    }
     fun sendMsg(msg: String) {
         if(isClosed){
             connect()
@@ -171,17 +193,24 @@ class Client : WebSocketClient {
         if (msg.isEmpty()){
             return
         }
-        val call = post(
-            PWL_SEND,
-            "{\"content\":\"$msg\"}"
-        )
-        call?.execute().use {}
-        if(pklist.size>0){
-            val selectedSeries = pklist.toMutableList()
-            pklist.clear()
             GlobalScope.launch {
+                val call = post(
+                    PWL_SEND,
+                    "{\"content\":\"$msg\"}"
+                )
+                call?.execute().use {
+                    val res =
+                        Gson().fromJson(it?.body()?.string(), Msg::class.java)
+                    if(res.code!=0){
+                        logger.error(res.msg)
+                        addErrToOChat("sendMsg",res.msg)
+                    }
+                }
+                if(pklist.size>0){
+                    val selectedSeries = pklist.toMutableList()
+                    pklist.clear()
                 selectedSeries.forEach {
-                    post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute()
+                    post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute().use {  }
                 }
             }
         }
@@ -208,7 +237,6 @@ class Client : WebSocketClient {
 
     fun login(): Boolean {
         val md5p = password?.let { md5(it) }
-        println(password + md5p)
         val call = post(
             PWL_LOGIN,
             "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"captcha\":\"\"}"

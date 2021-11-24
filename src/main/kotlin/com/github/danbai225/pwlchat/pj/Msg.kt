@@ -11,4 +11,6 @@ class Msg {
     var content: String = ""
     var onlineChatCnt = 0
     var users: List<User>? = null
+    var msg: String? = null
+    var code = 0
 }

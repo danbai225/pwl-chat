@@ -28,22 +28,35 @@ class ToolWindowContent{
         return root
     }
     fun sendMsg(){
-        iChat?.text?.let { it1 -> client?.sendMsg(it1) }
+        if (!client?.islogin!!){
+            client?.userName=Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
+            client?.password=Messages.showPasswordDialog("Password", "鱼油登录")
+            if (client?.login() == true){
+                send?.text="send"
+            }else{
+                Messages.showMessageDialog("验证未通过","MSG",Messages.getInformationIcon())
+                return
+            }
+        }
+        var msg=iChat?.text
         iChat?.text=""
+        var split = msg?.split(" ")
+        //命令解析
+        when(split?.get(0)?.toLowerCase()){
+            "#help"->{
+                oChat?.text+="帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n"
+                return
+            }
+            "#packet"->{
+                client?.packet(split?.get(1)?.toInt(),split[2].toInt(),split[3])
+                return
+            }
+        }
+        msg?.let { client?.sendMsg(it) }
     }
     private fun even(){
         send?.addActionListener {
-            if (!client?.islogin!!){
-                client?.userName=Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
-                client?.password=Messages.showPasswordDialog("Password", "鱼油登录")
-                if (client?.login() == true){
-                    send?.text="send"
-                }else{
-                    Messages.showMessageDialog("验证未通过","MSG",Messages.getInformationIcon())
-                }
-            }else{
-                sendMsg()
-            }
+            sendMsg()
         }
         iChat!!.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
