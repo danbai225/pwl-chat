@@ -19,13 +19,12 @@ import org.jsoup.nodes.Document
 import java.net.URI
 import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.swing.JButton
 import javax.swing.JScrollBar
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
-import kotlin.collections.ArrayList
 
 
 val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
@@ -47,10 +46,24 @@ class Client : WebSocketClient {
         load()
     }
 
-    fun md5(str: String): String {
-        val digest = MessageDigest.getInstance("MD5")
-        val result = digest.digest(str.toByteArray())
-        return toHex(result).replace("\\s".toRegex(), "")
+    private fun md5(input: String?): String? {
+        if (input == null || input.length == 0) {
+            return null
+        }
+        try {
+            val md5 = MessageDigest.getInstance("MD5")
+            md5.update(input.toByteArray())
+            val byteArray = md5.digest()
+            val sb = StringBuilder()
+            for (b in byteArray) {
+                // 一个byte格式化成两位的16进制，不足两位高位补零
+                sb.append(String.format("%02x", b))
+            }
+            return sb.toString().replace("\\s".toRegex(), "").toLowerCase()
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     fun verifyLogin(): Boolean {
