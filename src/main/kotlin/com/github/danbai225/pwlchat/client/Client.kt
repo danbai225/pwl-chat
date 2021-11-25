@@ -194,7 +194,7 @@ class Client : WebSocketClient {
             lines = newText?.size!!
         }
     }
-
+    @Synchronized
     fun gotoConsoleLow() {
         val scrollBar: JScrollBar = consoleScroll?.verticalScrollBar!!
         scrollBar.value = scrollBar.maximum
