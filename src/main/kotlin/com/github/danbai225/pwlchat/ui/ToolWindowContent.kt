@@ -7,54 +7,58 @@ import java.awt.event.KeyEvent
 import javax.swing.*
 
 
-class ToolWindowContent{
-    var root: JPanel?=null
-    var send: JButton?=null
-    var iChat:JTextArea?=null
-    var oChat:JTextPane?=null
-    var client: Client?=Client()
-    var consoleScroll:JScrollPane?=null
+class ToolWindowContent {
+    var root: JPanel? = null
+    var send: JButton? = null
+    var iChat: JTextArea? = null
+    var oChat: JTextPane? = null
+    var client: Client? = Client()
+    var consoleScroll: JScrollPane? = null
+
     init {
         even()
-        client?.oChat=oChat
-        client?.consoleScroll=consoleScroll
+        client?.oChat = oChat
+        client?.consoleScroll = consoleScroll
         client?.connect()
-        if (client?.verifyLogin()==true){
-            send?.text="send"
+        if (client?.verifyLogin() == true) {
+            send?.text = "send"
         }
-       // BorderLayout.WEST
+        // BorderLayout.WEST
     }
+
     fun getContent(): JComponent? {
         return root
     }
-    fun sendMsg(){
-        if (!client?.islogin!!){
-            client?.userName=Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
-            client?.password=Messages.showPasswordDialog("Password", "鱼油登录")
-            if (client?.login() == true){
-                send?.text="send"
-            }else{
-                Messages.showMessageDialog("验证未通过","MSG",Messages.getInformationIcon())
+
+    fun sendMsg() {
+        if (!client?.islogin!!) {
+            client?.userName = Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
+            client?.password = Messages.showPasswordDialog("Password", "鱼油登录")
+            if (client?.login() == true) {
+                send?.text = "send"
+            } else {
+                Messages.showMessageDialog("验证未通过", "MSG", Messages.getInformationIcon())
                 return
             }
         }
-        var msg=iChat?.text
-        iChat?.text=""
+        var msg = iChat?.text
+        iChat?.text = ""
         var split = msg?.split(" ")
         //命令解析
-        when(split?.get(0)?.toLowerCase()){
-            "#help"->{
-                oChat?.text+="帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n"
+        when (split?.get(0)?.toLowerCase()) {
+            "#help" -> {
+                oChat?.text += "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n"
                 return
             }
-            "#packet"->{
-                client?.packet(split?.get(1)?.toInt(),split[2].toInt(),split[3])
+            "#packet" -> {
+                client?.packet(split?.get(1)?.toInt(), split[2].toInt(), split[3])
                 return
             }
         }
         msg?.let { client?.sendMsg(it) }
     }
-    private fun even(){
+
+    private fun even() {
         send?.addActionListener {
             sendMsg()
         }
@@ -69,7 +73,7 @@ class ToolWindowContent{
 
             override fun keyReleased(e: KeyEvent) {
                 if ((e.isControlDown || e.isMetaDown) && e.keyCode == KeyEvent.VK_V) {
-                    if (client?.islogin==false) {
+                    if (client?.islogin == false) {
                         return
                     }
                     // 粘贴图片

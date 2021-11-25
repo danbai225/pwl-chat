@@ -1,9 +1,5 @@
 package com.github.danbai225.pwlchat.pj
 
-import com.github.danbai225.pwlchat.pj.RedPack.Who
-
-
-
 
 class RedPack {
     class Who {
@@ -13,6 +9,7 @@ class RedPack {
         var userName: String? = null
         var userId: String? = null
     }
+
     class Info {
         var msg: String? = null
         var userAvatarURL: String? = null
@@ -20,6 +17,7 @@ class RedPack {
         var userName: String? = null
         var got = 0
     }
+
     var msg: String? = null
     var senderId: String? = null
     var msgType: String? = null

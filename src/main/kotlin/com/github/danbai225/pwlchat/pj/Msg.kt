@@ -12,8 +12,8 @@ class Msg {
     var onlineChatCnt = 0
     var users: List<User>? = null
     var msg: String? = null
-    var whoGot:String? = null
-    var whoGive:String? = null
-    var got:String? = null
+    var whoGot: String? = null
+    var whoGive: String? = null
+    var got: String? = null
     var code = 0
 }

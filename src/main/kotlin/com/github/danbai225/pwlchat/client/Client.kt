@@ -30,6 +30,7 @@ import javax.swing.JTextPane
 val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
 val client = OkHttpClient()
 val logger = LoggerFactory.getLogger(Client::class.java)
+
 class Client : WebSocketClient {
     var cookie: String? = ""
     var oChat: JTextPane? = null
@@ -39,14 +40,16 @@ class Client : WebSocketClient {
     var password: String? = ""
     var islogin: Boolean = false
     var liveness = 0.0
-    var pklist:ArrayList<String> =ArrayList()
-    var numberOfReconnections=0
-    var lines=0
+    var pklist: ArrayList<String> = ArrayList()
+    var numberOfReconnections = 0
+    var lines = 0
+
     constructor(draft: Draft?) : super(URI.create(PWL_WSS), draft) {}
     constructor() : super(URI.create(PWL_WSS)) {
         //加载数据
         load()
     }
+
     private fun md5(input: String?): String? {
         if (input == null || input.length == 0) {
             return null
@@ -104,14 +107,14 @@ class Client : WebSocketClient {
 
     override fun onOpen(handshakedata: ServerHandshake) {
         logger.info("new connection opened")
-        numberOfReconnections=0
+        numberOfReconnections = 0
     }
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
         logger.info("closed with exit code $code additional info: $reason")
-        if(numberOfReconnections<MAX_R){
+        if (numberOfReconnections < MAX_R) {
             numberOfReconnections++
-            Thread.sleep((numberOfReconnections*1500).toLong())
+            Thread.sleep((numberOfReconnections * 1500).toLong())
             connect()
         }
     }
@@ -122,22 +125,22 @@ class Client : WebSocketClient {
             Gson().fromJson(message, Msg::class.java)
         when (msg.type) {
             "msg" -> {
-                if (msg.content.indexOf("\"msgType\":\"redPacket\"")>0){
+                if (msg.content.indexOf("\"msgType\":\"redPacket\"") > 0) {
                     //红包消息
                     val red =
                         Gson().fromJson(msg.content, RedPack::class.java)
                     msg.oId?.let {
-                        if(pklist.size>100){
+                        if (pklist.size > 100) {
                             pklist.removeAt(0)
                         }
                         pklist.add(it)
                     }
-                    addMsgToOChat(red.msg+"(🧧红包消息)", msg.userName)
-                }else{
+                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName)
+                } else {
                     val doc: Document = Jsoup.parse(msg.content)
-                    var m=doc.text()
-                    if (m.length==0){
-                        m="(表情.jpg)"
+                    var m = doc.text()
+                    if (m.length == 0) {
+                        m = "(表情.jpg)"
                     }
                     addMsgToOChat(m, msg.userName)
                 }
@@ -146,8 +149,8 @@ class Client : WebSocketClient {
                 online = msg.onlineChatCnt
             }
             //抢红包消息
-            "redPacketStatus"->{
-                addInfoToOChat("openPacket","${msg.whoGot}抢到了${msg.whoGive}的红包")
+            "redPacketStatus" -> {
+                addInfoToOChat("openPacket", "${msg.whoGot}抢到了${msg.whoGive}的红包")
             }
         }
 
@@ -174,69 +177,74 @@ class Client : WebSocketClient {
         gotoConsoleLow()
         linesADD()
     }
+
     fun addInfoToOChat(op: String?, msg: String?) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
         oChat?.text += "[Info-$time] $op: $msg\n"
         gotoConsoleLow()
         linesADD()
     }
-    fun linesADD(){
+
+    fun linesADD() {
         lines++
-        if (lines>2000){
+        if (lines > 2000) {
             var split = oChat?.text?.split("\n")
-            var newText=split?.slice((split?.size?.minus(1000) ?: 1000)..(split?.size?.minus(1)?:1999))
-            oChat?.text=newText?.joinToString(separator = "\n")
-            lines= newText?.size!!
+            var newText = split?.slice((split?.size?.minus(1000) ?: 1000)..(split?.size?.minus(1) ?: 1999))
+            oChat?.text = newText?.joinToString(separator = "\n")
+            lines = newText?.size!!
         }
     }
+
     @Synchronized
     fun gotoConsoleLow() {
         val scrollBar: JScrollBar = consoleScroll?.verticalScrollBar!!
         scrollBar.value = scrollBar.maximum
         consoleScroll?.updateUI()
     }
-    fun packet(count:Int,money: Int,msg: String){
-        var mm=msg
-        if (msg.isEmpty()){
-            mm="摸鱼红包"
+
+    fun packet(count: Int, money: Int, msg: String) {
+        var mm = msg
+        if (msg.isEmpty()) {
+            mm = "摸鱼红包"
         }
         sendMsg("[redpacket]{\\\"money\\\":\\\"$money\\\",\\\"count\\\":\\\"$count\\\",\\\"msg\\\":\\\"$mm\\\"}[/redpacket]")
     }
+
     fun sendMsg(msg: String) {
-        if(isClosed){
+        if (isClosed) {
             connect()
         }
-        if (msg.isEmpty()){
+        if (msg.isEmpty()) {
             return
         }
-            GlobalScope.launch {
-                val call = post(
-                    PWL_SEND,
-                    "{\"content\":\"$msg\"}"
-                )
-                try {
-                    call?.execute().use {
-                        val res =
-                            Gson().fromJson(it?.body()?.string(), Msg::class.java)
-                        if(res.code!=0){
-                            logger.error(res.msg)
-                            addErrToOChat("sendMsg",res.msg)
-                        }
+        GlobalScope.launch {
+            val call = post(
+                PWL_SEND,
+                "{\"content\":\"$msg\"}"
+            )
+            try {
+                call?.execute().use {
+                    val res =
+                        Gson().fromJson(it?.body()?.string(), Msg::class.java)
+                    if (res.code != 0) {
+                        logger.error(res.msg)
+                        addErrToOChat("sendMsg", res.msg)
                     }
-                }catch (e: Exception){
-                    addErrToOChat("sendMsg",e.message)
                 }
+            } catch (e: Exception) {
+                addErrToOChat("sendMsg", e.message)
+            }
 
-                if(pklist.size>0){
-                    val selectedSeries = pklist.toMutableList()
-                    pklist.clear()
+            if (pklist.size > 0) {
+                val selectedSeries = pklist.toMutableList()
+                pklist.clear()
                 selectedSeries.forEach {
                     post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute().use {
                         val res =
                             Gson().fromJson(it?.body()?.string(), RedPack::class.java)
                         res.who?.forEach {
-                            if(it.userName==userName){
-                                addInfoToOChat("openPacket","你抢到了${res.info?.userName}的红包,${it.userMoney}$")
+                            if (it.userName == userName) {
+                                addInfoToOChat("openPacket", "你抢到了${res.info?.userName}的红包,${it.userMoney}$")
                             }
                         }
                     }
@@ -278,7 +286,7 @@ class Client : WebSocketClient {
                 islogin = true
                 cookie = "sym-ce=${msg.token}; "
                 save()
-                if(verifyLogin()){
+                if (verifyLogin()) {
                     return true
                 }
             }
