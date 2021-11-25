@@ -7,7 +7,11 @@
 ## Template ToDo list
 
 <!-- Plugin description -->
-这是一个pwl聊天插件
+This is a [pwl](https://pwl.icu) chat plugin，We are a group of people who love work and the boss.
+
+这是一个[pwl](https://pwl.icu)聊天插件，我们是一群热爱工作和老板的人。
+
+输入#help获取帮助
 <!-- Plugin description end -->
 
 ## Installation
