@@ -43,7 +43,6 @@ class Client : WebSocketClient {
     var pklist: ArrayList<String> = ArrayList()
     var numberOfReconnections = 0
     var lines = 0
-
     constructor(draft: Draft?) : super(URI.create(PWL_WSS), draft) {}
     constructor() : super(URI.create(PWL_WSS)) {
         //加载数据
@@ -107,6 +106,7 @@ class Client : WebSocketClient {
 
     override fun onOpen(handshakedata: ServerHandshake) {
         logger.info("new connection opened")
+        addInfoToOChat("onOpen","连接成功")
         numberOfReconnections = 0
     }
 
@@ -195,7 +195,6 @@ class Client : WebSocketClient {
         }
     }
 
-    @Synchronized
     fun gotoConsoleLow() {
         val scrollBar: JScrollBar = consoleScroll?.verticalScrollBar!!
         scrollBar.value = scrollBar.maximum
