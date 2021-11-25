@@ -214,14 +214,19 @@ class Client : WebSocketClient {
                     PWL_SEND,
                     "{\"content\":\"$msg\"}"
                 )
-                call?.execute().use {
-                    val res =
-                        Gson().fromJson(it?.body()?.string(), Msg::class.java)
-                    if(res.code!=0){
-                        logger.error(res.msg)
-                        addErrToOChat("sendMsg",res.msg)
+                try {
+                    call?.execute().use {
+                        val res =
+                            Gson().fromJson(it?.body()?.string(), Msg::class.java)
+                        if(res.code!=0){
+                            logger.error(res.msg)
+                            addErrToOChat("sendMsg",res.msg)
+                        }
                     }
+                }catch (e: Exception){
+                    addErrToOChat("sendMsg",e.message)
                 }
+
                 if(pklist.size>0){
                     val selectedSeries = pklist.toMutableList()
                     pklist.clear()
