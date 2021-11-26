@@ -13,7 +13,9 @@
     <children>
       <grid id="d434c" layout-manager="BorderLayout" hgap="0" vgap="0">
         <constraints border-constraint="Center"/>
-        <properties/>
+        <properties>
+          <preferredSize width="1" height="16"/>
+        </properties>
         <border type="none"/>
         <children>
           <scrollpane id="f5e3d" binding="consoleScroll">

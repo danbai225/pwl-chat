@@ -26,19 +26,15 @@ import java.util.*
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import kotlin.collections.ArrayList
+import kotlin.concurrent.timer
 
-
-val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
-val client = OkHttpClient()
-val logger: Logger = LoggerFactory.getLogger(Client::class.java)
-
-class Client//加载数据
-    : WebSocketClient(URI.create(PWL_WSS)) {
+class Client{
     /**
      * 基础属性和方法
      */
     private var cookie: String = ""
     private var online: Int? = 0
+    private val client = OkHttpClient()
     var userName: String? = ""
     var password: String? = ""
     var isLogin: Boolean = false
@@ -50,9 +46,21 @@ class Client//加载数据
     private var lastOid: String? = ""
     var consoleScroll: JScrollPane? = null
     var oChat: JTextPane? = null
-    var  project: Project?= null
+    var project: Project?= null
+    private var ws:ws?=null
     init {
         load()
+        connect()
+        val timer = timer("定时Thread_name", false, 2000, 1000){
+            gotoConsoleLow()
+            if(ws?.isClosed==true){
+                addInfoToOChat("ws","连接已断开")
+                connect()
+                if(ws?.isClosed==false){
+                    addInfoToOChat("ws","连接已恢复")
+                }
+            }
+        }
     }
     //加载持久数据
     private fun load() {
@@ -142,9 +150,6 @@ class Client//加载数据
     }
     //发送消息
     fun sendMsg(msg: String) {
-        if (isClosed) {
-            connect()
-        }
         if (msg.isEmpty()) {
             return
         }
@@ -183,6 +188,7 @@ class Client//加载数据
             }
         }
     }
+
     //撤回消息
     fun revoke() {
         delete("$PWL_REVOKE$lastOid")?.execute().use {
@@ -221,21 +227,13 @@ class Client//加载数据
     /**
      * WebSocket实现区
      */
-    override fun onOpen(handshakedata: ServerHandshake) {
-        logger.info("new connection opened")
-        numberOfReconnections = 0
+    private fun connect() {
+        ws=ws()
+        ws?.client=this
+        ws?.connect()
     }
 
-    override fun onClose(code: Int, reason: String, remote: Boolean) {
-        logger.info("closed with exit code $code additional info: $reason")
-        if (numberOfReconnections < MAX_R) {
-            numberOfReconnections++
-            Thread.sleep((numberOfReconnections * 1500).toLong())
-            connect()
-        }
-    }
-
-    override fun onMessage(message: String) {
+     fun onMessage(message: String) {
         //println("received message: $message")
         val msg =
             Gson().fromJson(message, Msg::class.java)
@@ -275,13 +273,6 @@ class Client//加载数据
 
     }
 
-    override fun onMessage(message: ByteBuffer) {
-        logger.info("received ByteBuffer")
-    }
-
-    override fun onError(ex: Exception) {
-        logger.error("an error occurred:$ex")
-    }
 
     /**
      * UI控制区
@@ -289,24 +280,25 @@ class Client//加载数据
     private fun addMsgToOChat(msg: String?, UserName: String?) {
         val time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
         oChat?.text += "[$time] $UserName: $msg\n"
-        gotoConsoleLow()
         linesADD()
         if(eventLog){
-            sendNotify(UserName!!, msg!!+"\n", NotificationType.INFORMATION)
+            var a:String?=""
+            while (a?.length!! <(msg?.length?.div(4)!!)){
+                a+=" "
+            }
+            sendNotify(UserName!!, msg!!+" "+a, NotificationType.INFORMATION)
         }
     }
 
     private fun addErrToOChat(op: String?, msg: String?) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
         oChat?.text += "[Err-$time] $op: $msg\n"
-        gotoConsoleLow()
         linesADD()
     }
 
     private fun addInfoToOChat(op: String?, msg: String?) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
         oChat?.text += "[Info-$time] $op: $msg\n"
-        gotoConsoleLow()
         linesADD()
     }
 
@@ -333,13 +325,14 @@ class Client//加载数据
      */
     //teyxBFF7JjkXHv
     companion object {
-        private const val PWL_WSS = "wss://pwl.icu/chat-room-channel"
-        private const val PWL_LOGIN = "https://pwl.icu/login"
-        private const val PWL_LIVE = "https://pwl.icu/user/liveness"
-        private const val PWL_SEND = "https://pwl.icu/chat-room/send"
-        private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
-        private const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
-        private const val MAX_R = 15
+         const val PWL_WSS = "wss://pwl.icu/chat-room-channel"
+         const val PWL_LOGIN = "https://pwl.icu/login"
+         const val PWL_LIVE = "https://pwl.icu/user/liveness"
+         const val PWL_SEND = "https://pwl.icu/chat-room/send"
+         const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
+         const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
+         val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
+         val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }
 
 }

@@ -27,7 +27,6 @@ class ToolWindowContent(p: Project?) {
         client?.project=project
         client?.oChat = oChat
         client?.consoleScroll = consoleScroll
-        client?.connect()
         if (client?.verifyLogin() == true) {
             send?.text = "send"
         }
