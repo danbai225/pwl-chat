@@ -292,7 +292,7 @@ class Client//加载数据
         gotoConsoleLow()
         linesADD()
         if(eventLog){
-            sendNotify("Debug", "$UserName: $msg", NotificationType.INFORMATION)
+            sendNotify(UserName!!, msg!!+"\n", NotificationType.INFORMATION)
         }
     }
 
