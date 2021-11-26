@@ -56,7 +56,7 @@ class ToolWindowContent(p: Project?) {
         //命令解析
         when (split?.get(0)?.toLowerCase()) {
             "#help","#帮助" -> {
-                oChat?.text += "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n#revoke - 撤回最后一条发送的消息\n#exit - 退出登陆\n#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)"
+                oChat?.text += "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n#revoke - 撤回最后一条发送的消息\n#exit - 退出登陆\n#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)\n"
                 return
             }
             "#packet","#红包" -> {
@@ -74,6 +74,7 @@ class ToolWindowContent(p: Project?) {
             }
             "#eventlog","#事件输出" -> {
                 client?.eventLog = split[1].toInt()==1
+                client?.save()
                 return
             }
         }

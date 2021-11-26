@@ -76,7 +76,7 @@ class Client//加载数据
         }
     }
     //数据持久化
-    private fun save() {
+    fun save() {
         PropertiesComponent.getInstance().setValue("pwl_cookie", cookie)
         PropertiesComponent.getInstance().setValue("pwl_userName", userName)
         PropertiesComponent.getInstance().setValue("pwl_password", password)
