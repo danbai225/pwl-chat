@@ -4,6 +4,7 @@ import com.github.danbai225.pwlchat.pj.Liveness
 import com.github.danbai225.pwlchat.pj.Msg
 import com.github.danbai225.pwlchat.pj.RedPack
 import com.github.danbai225.pwlchat.pj.loginInfo
+import com.github.danbai225.pwlchat.utils.StringUtils
 import com.google.gson.Gson
 import com.intellij.ide.util.PropertiesComponent
 import com.jetbrains.rd.util.use
@@ -11,196 +12,119 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.java_websocket.client.WebSocketClient
-import org.java_websocket.drafts.Draft
 import org.java_websocket.handshake.ServerHandshake
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.ByteBuffer
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.swing.JScrollBar
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
+import kotlin.collections.ArrayList
 
 
 val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
 val client = OkHttpClient()
-val logger = LoggerFactory.getLogger(Client::class.java)
+val logger: Logger = LoggerFactory.getLogger(Client::class.java)
 
-class Client : WebSocketClient {
-    var cookie: String? = ""
-    var oChat: JTextPane? = null
-    var online: Int? = 0
-    var consoleScroll: JScrollPane? = null
+class Client//加载数据
+    : WebSocketClient(URI.create(PWL_WSS)) {
+    /**
+     * 基础属性和方法
+     */
+    private var cookie: String = ""
+    private var online: Int? = 0
     var userName: String? = ""
     var password: String? = ""
-    var islogin: Boolean = false
-    var liveness = 0.0
-    var pklist: ArrayList<String> = ArrayList()
-    var numberOfReconnections = 0
-    var lines = 0
-    constructor(draft: Draft?) : super(URI.create(PWL_WSS), draft) {}
-    constructor() : super(URI.create(PWL_WSS)) {
-        //加载数据
+    var isLogin: Boolean = false
+    private var onlineVitality= 0.0
+    private var pkList: ArrayList<String> = ArrayList()
+    private var numberOfReconnections = 0
+    private var lines = 0
+    private var lastOid: String? = ""
+    var consoleScroll: JScrollPane? = null
+    var oChat: JTextPane? = null
+    init {
         load()
     }
-
-    private fun md5(input: String?): String? {
-        if (input == null || input.length == 0) {
-            return null
-        }
-        try {
-            val md5 = MessageDigest.getInstance("MD5")
-            md5.update(input.toByteArray())
-            val byteArray = md5.digest()
-            val sb = StringBuilder()
-            for (b in byteArray) {
-                // 一个byte格式化成两位的16进制，不足两位高位补零
-                sb.append(String.format("%02x", b))
+    //加载持久数据
+    private fun load() {
+          PropertiesComponent.getInstance().getValue("pwl_cookie").let {
+              if (it != null) {
+                  cookie=it
+              }
+          }
+        PropertiesComponent.getInstance().getValue("pwl_userName").let {
+            if (it != null) {
+                userName=it
             }
-            return sb.toString().replace("\\s".toRegex(), "").toLowerCase()
-        } catch (e: NoSuchAlgorithmException) {
-            e.printStackTrace()
         }
-        return null
+        PropertiesComponent.getInstance().getValue("pwl_password").let {
+            if (it != null) {
+                password=it
+            }
+        }
+    }
+    //数据持久化
+    private fun save() {
+        PropertiesComponent.getInstance().setValue("pwl_cookie", cookie)
+        PropertiesComponent.getInstance().setValue("pwl_userName", userName)
+        PropertiesComponent.getInstance().setValue("pwl_password", password)
     }
 
+    /**
+     * HTTP方法区
+     */
+    private fun post(url: String, json: String): Call? {
+        val requestBody: RequestBody = RequestBody.create(JSON, java.lang.String.valueOf(json))
+        val request: Request = Request.Builder()
+            .url(url)
+            .addHeader("Cookie", cookie)
+            .post(requestBody)
+            .build()
+        return client.newCall(request)
+    }
+
+    private fun delete(url: String): Call? {
+        val request: Request = Request.Builder()
+            .url(url)
+            .addHeader("Cookie", cookie)
+            .delete()
+            .build()
+        return client.newCall(request)
+    }
+
+    fun get(url: String): Call? {
+        val request: Request = Request.Builder()
+            .url(url)
+            .addHeader("Cookie", cookie)
+            .get()
+            .build()
+        return client.newCall(request)
+    }
+
+    /**
+     * 客户端接口区
+     */
+    //登陆有效性验证
     fun verifyLogin(): Boolean {
         if (cookie != "") {
-            var get = get(PWL_LIVE)
+            val get = get(PWL_LIVE)
             get?.execute().use { response ->
                 if (response?.code() == 200) {
-                    var j = response?.body()?.string()
-                    val msg =
-                        Gson().fromJson(j, Liveness::class.java)
-                    liveness = msg.liveness
-                    islogin = true
+                    val msg = Gson().fromJson(response?.body()?.string(), Liveness::class.java)
+                    onlineVitality = msg.liveness
+                    isLogin = true
                     return true
                 }
             }
         }
         return false
     }
-
-    private fun load() {
-        if (PropertiesComponent.getInstance().getValue("pwl_cookie") != null) {
-            cookie = PropertiesComponent.getInstance().getValue("pwl_cookie")
-        }
-        if (PropertiesComponent.getInstance().getValue("pwl_userName") != null) {
-            userName = PropertiesComponent.getInstance().getValue("pwl_userName")
-        }
-        if (PropertiesComponent.getInstance().getValue("pwl_password") != null) {
-            password = PropertiesComponent.getInstance().getValue("pwl_password")
-        }
-    }
-
-    fun save() {
-        PropertiesComponent.getInstance().setValue("pwl_cookie", cookie)
-        PropertiesComponent.getInstance().setValue("pwl_userName", userName)
-        PropertiesComponent.getInstance().setValue("pwl_password", password)
-    }
-
-    override fun onOpen(handshakedata: ServerHandshake) {
-        logger.info("new connection opened")
-        addInfoToOChat("onOpen","连接成功")
-        numberOfReconnections = 0
-    }
-
-    override fun onClose(code: Int, reason: String, remote: Boolean) {
-        logger.info("closed with exit code $code additional info: $reason")
-        if (numberOfReconnections < MAX_R) {
-            numberOfReconnections++
-            Thread.sleep((numberOfReconnections * 1500).toLong())
-            connect()
-        }
-    }
-
-    override fun onMessage(message: String) {
-        //println("received message: $message")
-        val msg =
-            Gson().fromJson(message, Msg::class.java)
-        when (msg.type) {
-            "msg" -> {
-                if (msg.content.indexOf("\"msgType\":\"redPacket\"") > 0) {
-                    //红包消息
-                    val red =
-                        Gson().fromJson(msg.content, RedPack::class.java)
-                    msg.oId?.let {
-                        if (pklist.size > 100) {
-                            pklist.removeAt(0)
-                        }
-                        pklist.add(it)
-                    }
-                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName)
-                } else {
-                    val doc: Document = Jsoup.parse(msg.content)
-                    var m = doc.text()
-                    if (m.length == 0) {
-                        m = "(表情.jpg)"
-                    }
-                    addMsgToOChat(m, msg.userName)
-                }
-            }
-            "online" -> {
-                online = msg.onlineChatCnt
-            }
-            //抢红包消息
-            "redPacketStatus" -> {
-                addInfoToOChat("openPacket", "${msg.whoGot}抢到了${msg.whoGive}的红包")
-            }
-        }
-
-    }
-
-    override fun onMessage(message: ByteBuffer) {
-        logger.info("received ByteBuffer")
-    }
-
-    override fun onError(ex: Exception) {
-        logger.error("an error occurred:$ex")
-    }
-
-    fun addMsgToOChat(msg: String?, UserName: String?) {
-        val time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
-        oChat?.text += "[$time] $UserName: $msg\n"
-        gotoConsoleLow()
-        linesADD()
-    }
-
-    fun addErrToOChat(op: String?, msg: String?) {
-        val time = SimpleDateFormat("HH:mm:ss").format(Date())
-        oChat?.text += "[Err-$time] $op: $msg\n"
-        gotoConsoleLow()
-        linesADD()
-    }
-
-    fun addInfoToOChat(op: String?, msg: String?) {
-        val time = SimpleDateFormat("HH:mm:ss").format(Date())
-        oChat?.text += "[Info-$time] $op: $msg\n"
-        gotoConsoleLow()
-        linesADD()
-    }
-
-    fun linesADD() {
-        lines++
-        if (lines > 2000) {
-            var split = oChat?.text?.split("\n")
-            var newText = split?.slice((split?.size?.minus(1000) ?: 1000)..(split?.size?.minus(1) ?: 1999))
-            oChat?.text = newText?.joinToString(separator = "\n")
-            lines = newText?.size!!
-        }
-    }
-    @Synchronized
-    fun gotoConsoleLow() {
-        val scrollBar: JScrollBar = consoleScroll?.verticalScrollBar!!
-        scrollBar.value = scrollBar.maximum
-        consoleScroll?.updateUI()
-    }
-
+    //发送红包
     fun packet(count: Int, money: Int, msg: String) {
         var mm = msg
         if (msg.isEmpty()) {
@@ -208,7 +132,7 @@ class Client : WebSocketClient {
         }
         sendMsg("[redpacket]{\\\"money\\\":\\\"$money\\\",\\\"count\\\":\\\"$count\\\",\\\"msg\\\":\\\"$mm\\\"}[/redpacket]")
     }
-
+    //发送消息
     fun sendMsg(msg: String) {
         if (isClosed) {
             connect()
@@ -234,16 +158,16 @@ class Client : WebSocketClient {
                 addErrToOChat("sendMsg", e.message)
             }
 
-            if (pklist.size > 0) {
-                val selectedSeries = pklist.toMutableList()
-                pklist.clear()
+            if (pkList.size > 0) {
+                val selectedSeries = pkList.toMutableList()
+                pkList.clear()
                 selectedSeries.forEach {
-                    post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute().use {
-                        val res =
-                            Gson().fromJson(it?.body()?.string(), RedPack::class.java)
+                    post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute().use { rs ->
+                        val res = Gson().fromJson(rs?.body()?.string(), RedPack::class.java)
                         res.who?.forEach {
-                            if (it.userName == userName) {
-                                addInfoToOChat("openPacket", "你抢到了${res.info?.userName}的红包,${it.userMoney}$")
+                            r->
+                            if (r.userName == userName) {
+                                addInfoToOChat("openPacket", "你抢到了${res.info?.userName}的红包,${r.userMoney}$")
                             }
                         }
                     }
@@ -251,38 +175,26 @@ class Client : WebSocketClient {
             }
         }
     }
-
-    fun post(url: String, json: String): Call? {
-        var requestBody: RequestBody? = RequestBody.create(JSON, java.lang.String.valueOf(json))
-        val request: Request = Request.Builder()
-            .url(url)
-            .addHeader("Cookie", cookie)
-            .post(requestBody)
-            .build()
-        return client.newCall(request)
+    //撤回消息
+    fun revoke() {
+        delete("$PWL_REVOKE$lastOid")?.execute().use {
+            val msg = Gson().fromJson(it?.body()?.string(), Msg::class.java)
+            if (msg.code != 0) {
+                addErrToOChat("revoke", msg.msg)
+            }
+        }
     }
-
-    fun get(url: String): Call? {
-        val request: Request = Request.Builder()
-            .url(url)
-            .addHeader("Cookie", cookie)
-            .get()
-            .build()
-        return client.newCall(request)
-    }
-
+    //登陆
     fun login(): Boolean {
-        val md5p = password?.let { md5(it) }
+        val md5p = password?.let { StringUtils.md5(it) }
         val call = post(
             PWL_LOGIN,
             "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"captcha\":\"\"}"
         )
         call?.execute().use { response ->
-            var j = response?.body()?.string()
-            val msg =
-                Gson().fromJson(j, loginInfo::class.java)
+            val msg = Gson().fromJson(response?.body()?.string(), loginInfo::class.java)
             if (msg.code == 0) {
-                islogin = true
+                isLogin = true
                 cookie = "sym-ce=${msg.token}; "
                 save()
                 if (verifyLogin()) {
@@ -292,15 +204,128 @@ class Client : WebSocketClient {
         }
         return false
     }
+    fun exit(){
+        cookie=""
+        userName=""
+        password=""
+        isLogin=false
+    }
+    /**
+     * WebSocket实现区
+     */
+    override fun onOpen(handshakedata: ServerHandshake) {
+        logger.info("new connection opened")
+        numberOfReconnections = 0
+    }
 
+    override fun onClose(code: Int, reason: String, remote: Boolean) {
+        logger.info("closed with exit code $code additional info: $reason")
+        if (numberOfReconnections < MAX_R) {
+            numberOfReconnections++
+            Thread.sleep((numberOfReconnections * 1500).toLong())
+            connect()
+        }
+    }
+
+    override fun onMessage(message: String) {
+        //println("received message: $message")
+        val msg =
+            Gson().fromJson(message, Msg::class.java)
+        when (msg.type) {
+            "msg" -> {
+                if (msg.content.indexOf("\"msgType\":\"redPacket\"") > 0) {
+                    //红包消息
+                    val red =
+                        Gson().fromJson(msg.content, RedPack::class.java)
+                    msg.oId?.let {
+                        if (pkList.size > 100) {
+                            pkList.removeAt(0)
+                        }
+                        pkList.add(it)
+                    }
+                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName)
+                } else {
+                    val doc: Document = Jsoup.parse(msg.content)
+                    var m = doc.text()
+                    if (m.isEmpty()) {
+                        m = "(表情.jpg)"
+                    }
+                    if (msg.userName == userName) {
+                        lastOid = msg.oId
+                    }
+                    addMsgToOChat(m, msg.userName)
+                }
+            }
+            "online" -> {
+                online = msg.onlineChatCnt
+            }
+            //抢红包消息
+            "redPacketStatus" -> {
+                addInfoToOChat("openPacket", "${msg.whoGot}抢到了${msg.whoGive}的红包")
+            }
+        }
+
+    }
+
+    override fun onMessage(message: ByteBuffer) {
+        logger.info("received ByteBuffer")
+    }
+
+    override fun onError(ex: Exception) {
+        logger.error("an error occurred:$ex")
+    }
+
+    /**
+     * UI控制区
+     */
+    private fun addMsgToOChat(msg: String?, UserName: String?) {
+        val time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
+        oChat?.text += "[$time] $UserName: $msg\n"
+        gotoConsoleLow()
+        linesADD()
+    }
+
+    private fun addErrToOChat(op: String?, msg: String?) {
+        val time = SimpleDateFormat("HH:mm:ss").format(Date())
+        oChat?.text += "[Err-$time] $op: $msg\n"
+        gotoConsoleLow()
+        linesADD()
+    }
+
+    private fun addInfoToOChat(op: String?, msg: String?) {
+        val time = SimpleDateFormat("HH:mm:ss").format(Date())
+        oChat?.text += "[Info-$time] $op: $msg\n"
+        gotoConsoleLow()
+        linesADD()
+    }
+
+    private fun linesADD() {
+        lines++
+        if (lines > 200) {
+            val split = oChat?.text?.split("\n")
+            val newText = split?.slice(split.size.minus(100)..split.size.minus(1))
+            oChat?.text = newText?.joinToString(separator = "\n")
+            lines = newText?.size!!
+        }
+    }
+
+    @Synchronized
+    fun gotoConsoleLow() {
+        consoleScroll?.verticalScrollBar?.value = consoleScroll?.verticalScrollBar?.maximum!!
+        consoleScroll?.updateUI()
+    }
+
+    /**
+     * 静态常量
+     */
     //teyxBFF7JjkXHv
     companion object {
         private const val PWL_WSS = "wss://pwl.icu/chat-room-channel"
-        private const val PWL_KEY = "https://pwl.icu/api/getKey"
         private const val PWL_LOGIN = "https://pwl.icu/login"
         private const val PWL_LIVE = "https://pwl.icu/user/liveness"
         private const val PWL_SEND = "https://pwl.icu/chat-room/send"
         private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
+        private const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
         private const val MAX_R = 15
     }
 

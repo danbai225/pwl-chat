@@ -14,7 +14,8 @@ class ToolWindowContent {
     var oChat: JTextPane? = null
     var client: Client? = Client()
     var consoleScroll: JScrollPane? = null
-
+    private var history: ArrayDeque<String> = ArrayDeque(4)
+    private var historyIndex=0
     init {
         even()
         client?.oChat = oChat
@@ -23,57 +24,81 @@ class ToolWindowContent {
         if (client?.verifyLogin() == true) {
             send?.text = "send"
         }
-        // BorderLayout.WEST
     }
-
     fun getContent(): JComponent? {
         return root
     }
-
     fun sendMsg() {
-        if (!client?.islogin!!) {
+        if (!client?.isLogin!!) {
             client?.userName = Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
             client?.password = Messages.showPasswordDialog("Password", "鱼油登录")
             if (client?.login() == true) {
                 send?.text = "send"
             } else {
-                Messages.showMessageDialog("验证未通过", "MSG", Messages.getInformationIcon())
+                Messages.showMessageDialog(":(验证未通过", "MSG", Messages.getInformationIcon())
                 return
             }
         }
-        var msg = iChat?.text
+        val msg = iChat?.text
+        if(history.size>10){
+            history.removeFirst()
+        }
+        msg?.let { history.addLast(it) }
         iChat?.text = ""
-        var split = msg?.split(" ")
+        val split = msg?.split(" ")
         //命令解析
         when (split?.get(0)?.toLowerCase()) {
-            "#help" -> {
+            "#help","#帮助" -> {
                 oChat?.text += "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n"
                 return
             }
-            "#packet" -> {
-                client?.packet(split?.get(1)?.toInt(), split[2].toInt(), split[3])
+            "#packet","#红包" -> {
+                client?.packet(split[1].toInt(), split[2].toInt(), split[3])
+                return
+            }
+            "#revoke","#撤回" -> {
+                client?.revoke()
+                return
+            }
+            "#exit","#退出" -> {
+                client?.exit()
+                send?.text="Login"
                 return
             }
         }
-        msg?.let { client?.sendMsg(it) }
+       // msg?.let { client?.sendMsg(it) }
     }
-
     private fun even() {
         send?.addActionListener {
             sendMsg()
         }
         iChat!!.addKeyListener(object : KeyAdapter() {
             override fun keyPressed(e: KeyEvent) {
-                if (KeyEvent.VK_ENTER == e.keyCode) {
-                    // 阻止默认事件
-                    e.consume()
-                    sendMsg()
+                when(e.keyCode){
+                    KeyEvent.VK_ENTER->{
+                        e.consume()
+                        sendMsg()
+                    }
+                    KeyEvent.VK_DOWN->{
+                        if(history.size>0){
+                            iChat?.text=history.first()
+                            history.addLast(history.first())
+                            history.removeFirst()
+                        }
+                    }
+                    KeyEvent.VK_UP->{
+                        if(history.size>0){
+                            iChat?.text=history.last()
+                            history.addFirst(history.last())
+                            history.removeLast()
+                        }
+                    }
                 }
             }
 
             override fun keyReleased(e: KeyEvent) {
                 if ((e.isControlDown || e.isMetaDown) && e.keyCode == KeyEvent.VK_V) {
-                    if (client?.islogin == false) {
+                    if (client?.isLogin == false) {
                         return
                     }
                     // 粘贴图片
