@@ -2,11 +2,23 @@ package com.github.danbai225.pwlchat.ui
 
 import com.github.danbai225.pwlchat.client.Client
 import com.github.danbai225.pwlchat.notify.sendNotify
-import com.intellij.notification.*
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.util.ui.ImageUtil
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import java.awt.Image
+import java.awt.Toolkit
+import java.awt.datatransfer.DataFlavor
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
+import java.io.File
+import javax.imageio.ImageIO
 import javax.swing.*
 
 
@@ -17,16 +29,29 @@ class ToolWindowContent(p: Project?) {
     var oChat: JTextPane? = null
     var client: Client? = Client()
     var consoleScroll: JScrollPane? = null
+    var userLabel: JLabel? = null
+    var c:JPanel?=null
+    var userlist:JList<String>?=null
+    private var userListModel: DefaultListModel<String>? = null
     private var  project: Project?= p
     private var history: ArrayDeque<String> = ArrayDeque(4)
     private fun sendNotify(title: String, content: String, type: NotificationType) {
         project?.let { sendNotify(it, title, content, type) }
     }
     init {
+        userListModel = DefaultListModel()
+        for (i in 0..9) {
+            userListModel!!.addElement(i.toString())
+        }
+        userlist?.model = userListModel
+
         even()
+
         client?.project=project
         client?.oChat = oChat
         client?.consoleScroll = consoleScroll
+        client?.userListModel = userListModel
+        client?.userLabel = userLabel
         if (client?.verifyLogin() == true) {
             send?.text = "send"
         }
@@ -112,22 +137,49 @@ class ToolWindowContent(p: Project?) {
                     if (client?.isLogin == false) {
                         return
                     }
+
                     // 粘贴图片
-//                    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
-//                    val transferable = clipboard.getContents(null)
-//                    try {
-//                        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-//                            val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
-//                            UploadUtils.uploadImageFile(fileList[0])
-//                        } else if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-//                            val image = transferable.getTransferData(DataFlavor.imageFlavor) as Image
-//                            UploadUtils.uploadImage(image)
-//                        }
-//                    } catch (exception: Exception) {
-//                        exception.printStackTrace()
-//                    }
+                    val clipboard = Toolkit.getDefaultToolkit().systemClipboard
+                    val transferable = clipboard.getContents(null)
+                    var url:String?=""
+                    try {
+                        if (transferable.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                            val fileList = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
+                            url = client?.upload(fileList[0])
+                            iChat?.text=iChat?.text?.replace(fileList[0].name,"")
+                        } else if (transferable.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+                            val image = transferable.getTransferData(DataFlavor.imageFlavor) as Image
+                                ByteArrayOutputStream().use { out ->
+                                    val bufferedImage: BufferedImage = ImageUtil.toBufferedImage(image)
+                                    ImageIO.write(bufferedImage, "jpg", out)
+                                    var file = File(System.currentTimeMillis().toString() + "pwl-chat.jpg")
+                                    file.writeBytes(out.toByteArray())
+                                    url = client?.upload(file)
+                                }
+                        }
+                    } catch (exception: Exception) {
+                        exception.printStackTrace()
+                    }
+                    if (!url?.isEmpty()!!){
+                        iChat?.text+="![image.png]($url)"
+                    }
                 }
             }
         })
+
+        userlist?.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    val list = e.source as JList<*>
+                    val index = list.selectedIndex //已选项的下标
+                    val obj = list.model.getElementAt(index) //取出数据
+                    iChat?.text+="@${obj} :"
+                    iChat?.requestFocusInWindow()
+                }
+            }
+        })
+    }
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger(ToolWindowContent::class.java)
     }
 }

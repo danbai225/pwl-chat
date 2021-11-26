@@ -1,9 +1,6 @@
 package com.github.danbai225.pwlchat.client
 
-import com.github.danbai225.pwlchat.pj.Liveness
-import com.github.danbai225.pwlchat.pj.Msg
-import com.github.danbai225.pwlchat.pj.RedPack
-import com.github.danbai225.pwlchat.pj.loginInfo
+import com.github.danbai225.pwlchat.pj.*
 import com.github.danbai225.pwlchat.utils.StringUtils
 import com.google.gson.Gson
 import com.intellij.ide.util.PropertiesComponent
@@ -19,10 +16,13 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.net.URI
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.swing.DefaultListModel
+import javax.swing.JLabel
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import kotlin.collections.ArrayList
@@ -47,6 +47,8 @@ class Client{
     var consoleScroll: JScrollPane? = null
     var oChat: JTextPane? = null
     var project: Project?= null
+    var userListModel: DefaultListModel<String>? = null
+    var userLabel: JLabel? = null
     private var ws:ws?=null
     init {
         load()
@@ -224,6 +226,30 @@ class Client{
         password=""
         isLogin=false
     }
+    fun upload(file: File): String? {
+        val requestBody: RequestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart(
+                "file[]", file.name,
+                RequestBody.create(MediaType.parse("multipart/form-data"), file)
+            )
+            .build()
+        val request: Request = Request.Builder()
+            .url(PWL_UPLOAD)
+            .addHeader("Cookie", cookie)
+            .post(requestBody)
+            .build()
+        try {
+            sendNotify("上传提示","文件上传中",NotificationType.INFORMATION)
+            client.newCall(request).execute().use {
+                val msg = Gson().fromJson(it.body()?.string(), Upload::class.java)
+                return msg.data?.succMap?.get(file.name)
+            }
+        } catch (e: Exception) {
+            addErrToOChat("upload", e.message)
+        }
+        return ""
+    }
     /**
      * WebSocket实现区
      */
@@ -264,6 +290,11 @@ class Client{
             }
             "online" -> {
                 online = msg.onlineChatCnt
+                userListModel?.clear()
+                msg.users?.forEach { user ->
+                    userListModel?.addElement(user.userName)
+                }
+                userLabel?.text="Online ${msg.users?.size}"
             }
             //抢红包消息
             "redPacketStatus" -> {
@@ -331,6 +362,7 @@ class Client{
          const val PWL_SEND = "https://pwl.icu/chat-room/send"
          const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
          const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
+         const val PWL_UPLOAD="https://pwl.icu/upload"
          val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
          val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }

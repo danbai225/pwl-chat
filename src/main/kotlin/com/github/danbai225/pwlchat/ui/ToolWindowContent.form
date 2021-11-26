@@ -18,25 +18,66 @@
         </properties>
         <border type="none"/>
         <children>
-          <scrollpane id="f5e3d" binding="consoleScroll">
+          <splitpane id="ab868">
             <constraints border-constraint="Center"/>
-            <properties/>
+            <properties>
+              <dividerLocation value="167"/>
+              <dividerSize value="5"/>
+              <enabled value="true"/>
+              <resizeWeight value="0.5"/>
+            </properties>
             <border type="none"/>
             <children>
-              <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
-                <constraints/>
-                <properties>
-                  <editable value="false"/>
-                  <text value=""/>
-                </properties>
-                <clientProperties>
-                  <JEditorPane.w3cLengthUnits class="java.lang.Boolean" value="false"/>
-                  <charset class="java.lang.String" value=""/>
-                  <html.disable class="java.lang.Boolean" value="false"/>
-                </clientProperties>
-              </component>
+              <scrollpane id="f5e3d" binding="consoleScroll">
+                <constraints>
+                  <splitpane position="right"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
+                    <constraints/>
+                    <properties>
+                      <editable value="false"/>
+                      <text value=""/>
+                    </properties>
+                    <clientProperties>
+                      <JEditorPane.w3cLengthUnits class="java.lang.Boolean" value="false"/>
+                      <charset class="java.lang.String" value=""/>
+                      <html.disable class="java.lang.Boolean" value="false"/>
+                    </clientProperties>
+                  </component>
+                </children>
+              </scrollpane>
+              <grid id="e0eb3" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints>
+                  <splitpane position="left"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <component id="885f2" class="javax.swing.JLabel" binding="userLabel">
+                    <constraints border-constraint="First"/>
+                    <properties>
+                      <horizontalAlignment value="0"/>
+                      <text value=""/>
+                    </properties>
+                  </component>
+                  <scrollpane id="8a646">
+                    <constraints border-constraint="Center"/>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="ab082" class="javax.swing.JList" binding="userlist">
+                        <constraints/>
+                        <properties/>
+                      </component>
+                    </children>
+                  </scrollpane>
+                </children>
+              </grid>
             </children>
-          </scrollpane>
+          </splitpane>
         </children>
       </grid>
       <grid id="be9e1" layout-manager="BorderLayout" hgap="0" vgap="0">
