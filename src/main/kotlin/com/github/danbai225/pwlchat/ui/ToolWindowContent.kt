@@ -77,7 +77,7 @@ class ToolWindowContent(p: Project?) {
                 return
             }
         }
-       // msg?.let { client?.sendMsg(it) }
+        msg?.let { client?.sendMsg(it) }
     }
     private fun even() {
         send?.addActionListener {
