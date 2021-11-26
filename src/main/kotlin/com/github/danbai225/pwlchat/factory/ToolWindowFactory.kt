@@ -12,7 +12,7 @@ class ToolWindowFactory : ToolWindowFactory {
         val contentManager: ContentManager = toolWindow.contentManager
         val labelContent: Content = contentManager.factory
             .createContent(
-                ToolWindowContent().getContent(),
+                ToolWindowContent(project).getContent(),
                 "DebugCommandLine",
                 false
             )

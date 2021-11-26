@@ -9,13 +9,31 @@
 
     这是一个[pwl](https://pwl.icu)聊天插件，我们是一群热爱工作和老板的人。
 
-    输入#help获取帮助
+    Enter`#Help`ForHelp
+
+    输入`#help`获取帮助
+
+    HelpCommand：Command starts with `#` Parameters are separated by spaces
+    #help - Output this help command
+    #packet - Send red envelope, parameter 1 (number) parameter 2 (total) parameter 3 (message)
+    #revoke - Withdraw the last message sent
+    #exit - sign out
+    #eventLog - Output chat parameter 1 in the event (whether 1 or 0 is turned on)
+
+    帮助命令：命令都是以`#`开头 参数用空格分割
+    #help - 输出本帮助命令
+    #packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)
+    #revoke - 撤回最后一条发送的消息
+    #exit - 退出登陆
+    #eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)
+
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="PWL"
                     anchor="bottom"
                     factoryClass="com.github.danbai225.pwlchat.factory.ToolWindowFactory"/>
+        <notificationGroup id="com.github.danbai225.pwlchat.notify" displayType="NONE"/>
     </extensions>
 
     <applicationListeners>

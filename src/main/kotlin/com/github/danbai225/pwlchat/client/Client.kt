@@ -7,6 +7,8 @@ import com.github.danbai225.pwlchat.pj.loginInfo
 import com.github.danbai225.pwlchat.utils.StringUtils
 import com.google.gson.Gson
 import com.intellij.ide.util.PropertiesComponent
+import com.intellij.notification.NotificationType
+import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.use
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -40,6 +42,7 @@ class Client//加载数据
     var userName: String? = ""
     var password: String? = ""
     var isLogin: Boolean = false
+    var eventLog:Boolean=false
     private var onlineVitality= 0.0
     private var pkList: ArrayList<String> = ArrayList()
     private var numberOfReconnections = 0
@@ -47,6 +50,7 @@ class Client//加载数据
     private var lastOid: String? = ""
     var consoleScroll: JScrollPane? = null
     var oChat: JTextPane? = null
+    var  project: Project?= null
     init {
         load()
     }
@@ -67,12 +71,16 @@ class Client//加载数据
                 password=it
             }
         }
+        PropertiesComponent.getInstance().getBoolean("pwl_eventLog").let {
+            eventLog=it
+        }
     }
     //数据持久化
     private fun save() {
         PropertiesComponent.getInstance().setValue("pwl_cookie", cookie)
         PropertiesComponent.getInstance().setValue("pwl_userName", userName)
         PropertiesComponent.getInstance().setValue("pwl_password", password)
+        PropertiesComponent.getInstance().setValue("pwl_eventLog", eventLog)
     }
 
     /**
@@ -283,6 +291,9 @@ class Client//加载数据
         oChat?.text += "[$time] $UserName: $msg\n"
         gotoConsoleLow()
         linesADD()
+        if(eventLog){
+            sendNotify("Debug", "$UserName: $msg", NotificationType.INFORMATION)
+        }
     }
 
     private fun addErrToOChat(op: String?, msg: String?) {
@@ -314,7 +325,9 @@ class Client//加载数据
         consoleScroll?.verticalScrollBar?.value = consoleScroll?.verticalScrollBar?.maximum!!
         consoleScroll?.updateUI()
     }
-
+    private fun sendNotify(title: String, content: String, type: NotificationType) {
+        project?.let { com.github.danbai225.pwlchat.notify.sendNotify(it, title, content, type) }
+    }
     /**
      * 静态常量
      */

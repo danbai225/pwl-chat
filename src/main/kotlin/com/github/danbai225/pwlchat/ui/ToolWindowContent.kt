@@ -1,23 +1,30 @@
 package com.github.danbai225.pwlchat.ui
 
 import com.github.danbai225.pwlchat.client.Client
+import com.github.danbai225.pwlchat.notify.sendNotify
+import com.intellij.notification.*
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.*
 
 
-class ToolWindowContent {
+class ToolWindowContent(p: Project?) {
     var root: JPanel? = null
     var send: JButton? = null
     var iChat: JTextArea? = null
     var oChat: JTextPane? = null
     var client: Client? = Client()
     var consoleScroll: JScrollPane? = null
+    private var  project: Project?= p
     private var history: ArrayDeque<String> = ArrayDeque(4)
-    private var historyIndex=0
+    private fun sendNotify(title: String, content: String, type: NotificationType) {
+        project?.let { sendNotify(it, title, content, type) }
+    }
     init {
         even()
+        client?.project=project
         client?.oChat = oChat
         client?.consoleScroll = consoleScroll
         client?.connect()
@@ -49,7 +56,7 @@ class ToolWindowContent {
         //命令解析
         when (split?.get(0)?.toLowerCase()) {
             "#help","#帮助" -> {
-                oChat?.text += "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n"
+                oChat?.text += "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n#revoke - 撤回最后一条发送的消息\n#exit - 退出登陆\n#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)"
                 return
             }
             "#packet","#红包" -> {
@@ -63,6 +70,10 @@ class ToolWindowContent {
             "#exit","#退出" -> {
                 client?.exit()
                 send?.text="Login"
+                return
+            }
+            "#eventlog","#事件输出" -> {
+                client?.eventLog = split[1].toInt()==1
                 return
             }
         }
