@@ -1,5 +1,6 @@
 package com.github.danbai225.pwlchat.client
 
+import com.github.danbai225.pwlchat.component.oChat
 import com.github.danbai225.pwlchat.pj.*
 import com.github.danbai225.pwlchat.utils.StringUtils
 import com.google.gson.Gson
@@ -49,6 +50,7 @@ class Client{
     var project: Project?= null
     var userListModel: DefaultListModel<String>? = null
     var userLabel: JLabel? = null
+    var ss: oChat?=null
     private var ws:ws?=null
     init {
         load()

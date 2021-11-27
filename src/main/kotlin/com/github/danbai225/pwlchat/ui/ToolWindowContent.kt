@@ -1,13 +1,17 @@
 package com.github.danbai225.pwlchat.ui
 
 import com.github.danbai225.pwlchat.client.Client
+import com.github.danbai225.pwlchat.draw.testDraw
 import com.github.danbai225.pwlchat.notify.sendNotify
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.util.ui.ImageUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.awt.BorderLayout
+import java.awt.Graphics
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
@@ -22,7 +26,7 @@ import javax.imageio.ImageIO
 import javax.swing.*
 
 
-class ToolWindowContent(p: Project?) {
+class ToolWindowContent(p: Project?):JPanel() {
     var root: JPanel? = null
     var send: JButton? = null
     var iChat: JTextArea? = null
@@ -30,7 +34,7 @@ class ToolWindowContent(p: Project?) {
     var client: Client? = Client()
     var consoleScroll: JScrollPane? = null
     var userLabel: JLabel? = null
-    var c:JPanel?=null
+    var draw:JPanel?=null
     var userlist:JList<String>?=null
     private var userListModel: DefaultListModel<String>? = null
     private var  project: Project?= p
@@ -39,6 +43,8 @@ class ToolWindowContent(p: Project?) {
         project?.let { sendNotify(it, title, content, type) }
     }
     init {
+        layout=BorderLayout()
+        add(root,BorderLayout.CENTER)
         userListModel = DefaultListModel()
         for (i in 0..9) {
             userListModel!!.addElement(i.toString())
@@ -46,7 +52,6 @@ class ToolWindowContent(p: Project?) {
         userlist?.model = userListModel
 
         even()
-
         client?.project=project
         client?.oChat = oChat
         client?.consoleScroll = consoleScroll
@@ -55,9 +60,12 @@ class ToolWindowContent(p: Project?) {
         if (client?.verifyLogin() == true) {
             send?.text = "send"
         }
+        var jbCefBrowser = JBCefBrowser("https://pwl.icu")
+        draw?.add(jbCefBrowser.component)
     }
+
     fun getContent(): JComponent? {
-        return root
+        return this
     }
     fun sendMsg() {
         if (!client?.isLogin!!) {
@@ -172,9 +180,11 @@ class ToolWindowContent(p: Project?) {
                 if (e.clickCount == 2) {
                     val list = e.source as JList<*>
                     val index = list.selectedIndex //已选项的下标
-                    val obj = list.model.getElementAt(index) //取出数据
-                    iChat?.text+="@${obj} :"
-                    iChat?.requestFocusInWindow()
+                    if (index>=0&&index<list.model.size){
+                        val obj = list.model.getElementAt(index) //取出数据
+                        iChat?.text+="@${obj} :"
+                        iChat?.requestFocusInWindow()
+                    }
                 }
             }
         })

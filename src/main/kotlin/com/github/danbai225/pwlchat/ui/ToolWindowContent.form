@@ -11,103 +11,127 @@
       <font/>
     </border>
     <children>
-      <grid id="d434c" layout-manager="BorderLayout" hgap="0" vgap="0">
+      <tabbedpane id="e14f6">
         <constraints border-constraint="Center"/>
-        <properties>
-          <preferredSize width="1" height="16"/>
-        </properties>
+        <properties/>
         <border type="none"/>
         <children>
-          <splitpane id="ab868">
-            <constraints border-constraint="Center"/>
-            <properties>
-              <dividerLocation value="167"/>
-              <dividerSize value="5"/>
-              <enabled value="true"/>
-              <resizeWeight value="0.5"/>
-            </properties>
+          <grid id="da6c2" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <tabbedpane title="Log"/>
+            </constraints>
+            <properties/>
             <border type="none"/>
             <children>
-              <scrollpane id="f5e3d" binding="consoleScroll">
-                <constraints>
-                  <splitpane position="right"/>
-                </constraints>
+              <grid id="be9e1" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="South"/>
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
-                    <constraints/>
+                  <component id="ec629" class="javax.swing.JButton" binding="send">
+                    <constraints border-constraint="East"/>
                     <properties>
-                      <editable value="false"/>
-                      <text value=""/>
-                    </properties>
-                    <clientProperties>
-                      <JEditorPane.w3cLengthUnits class="java.lang.Boolean" value="false"/>
-                      <charset class="java.lang.String" value=""/>
-                      <html.disable class="java.lang.Boolean" value="false"/>
-                    </clientProperties>
-                  </component>
-                </children>
-              </scrollpane>
-              <grid id="e0eb3" layout-manager="BorderLayout" hgap="0" vgap="0">
-                <constraints>
-                  <splitpane position="left"/>
-                </constraints>
-                <properties/>
-                <border type="none"/>
-                <children>
-                  <component id="885f2" class="javax.swing.JLabel" binding="userLabel">
-                    <constraints border-constraint="First"/>
-                    <properties>
-                      <horizontalAlignment value="0"/>
-                      <text value=""/>
+                      <text value="Login"/>
                     </properties>
                   </component>
-                  <scrollpane id="8a646">
+                  <scrollpane id="65177">
                     <constraints border-constraint="Center"/>
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="ab082" class="javax.swing.JList" binding="userlist">
+                      <component id="51506" class="javax.swing.JTextArea" binding="iChat">
                         <constraints/>
-                        <properties/>
+                        <properties>
+                          <lineWrap value="false"/>
+                          <text value=""/>
+                          <toolTipText value=""/>
+                        </properties>
                       </component>
                     </children>
                   </scrollpane>
                 </children>
               </grid>
+              <grid id="d434c" layout-manager="BorderLayout" hgap="0" vgap="0">
+                <constraints border-constraint="Center"/>
+                <properties>
+                  <preferredSize width="1" height="16"/>
+                </properties>
+                <border type="none"/>
+                <children>
+                  <splitpane id="ab868">
+                    <constraints border-constraint="Center"/>
+                    <properties>
+                      <dividerLocation value="241"/>
+                      <dividerSize value="5"/>
+                      <enabled value="true"/>
+                      <resizeWeight value="0.5"/>
+                    </properties>
+                    <border type="none"/>
+                    <children>
+                      <scrollpane id="f5e3d" binding="consoleScroll">
+                        <constraints>
+                          <splitpane position="right"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
+                            <constraints/>
+                            <properties>
+                              <editable value="false"/>
+                              <text value=""/>
+                            </properties>
+                            <clientProperties>
+                              <JEditorPane.w3cLengthUnits class="java.lang.Boolean" value="false"/>
+                              <charset class="java.lang.String" value=""/>
+                              <html.disable class="java.lang.Boolean" value="false"/>
+                            </clientProperties>
+                          </component>
+                        </children>
+                      </scrollpane>
+                      <grid id="e0eb3" layout-manager="BorderLayout" hgap="0" vgap="0">
+                        <constraints>
+                          <splitpane position="left"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <component id="885f2" class="javax.swing.JLabel" binding="userLabel">
+                            <constraints border-constraint="First"/>
+                            <properties>
+                              <horizontalAlignment value="0"/>
+                              <text value=""/>
+                            </properties>
+                          </component>
+                          <scrollpane id="8a646">
+                            <constraints border-constraint="Center"/>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="ab082" class="javax.swing.JList" binding="userlist">
+                                <constraints/>
+                                <properties/>
+                              </component>
+                            </children>
+                          </scrollpane>
+                        </children>
+                      </grid>
+                    </children>
+                  </splitpane>
+                </children>
+              </grid>
             </children>
-          </splitpane>
-        </children>
-      </grid>
-      <grid id="be9e1" layout-manager="BorderLayout" hgap="0" vgap="0">
-        <constraints border-constraint="South"/>
-        <properties/>
-        <border type="none"/>
-        <children>
-          <component id="ec629" class="javax.swing.JButton" binding="send">
-            <constraints border-constraint="East"/>
-            <properties>
-              <text value="Login"/>
-            </properties>
-          </component>
-          <scrollpane id="65177">
-            <constraints border-constraint="Center"/>
+          </grid>
+          <grid id="7418c" binding="draw" layout-manager="BorderLayout" hgap="0" vgap="0">
+            <constraints>
+              <tabbedpane title="Draw"/>
+            </constraints>
             <properties/>
             <border type="none"/>
-            <children>
-              <component id="51506" class="javax.swing.JTextArea" binding="iChat">
-                <constraints/>
-                <properties>
-                  <lineWrap value="false"/>
-                  <text value=""/>
-                  <toolTipText value=""/>
-                </properties>
-              </component>
-            </children>
-          </scrollpane>
+            <children/>
+          </grid>
         </children>
-      </grid>
+      </tabbedpane>
     </children>
   </grid>
 </form>
