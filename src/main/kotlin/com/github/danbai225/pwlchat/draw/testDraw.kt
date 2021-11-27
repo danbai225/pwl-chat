@@ -4,7 +4,7 @@ import java.awt.Graphics
 import javax.swing.JPanel
 
 
-class testDraw:JPanel() {
+class testDraw : JPanel() {
     override fun paint(graphics: Graphics) {
         // 必须先调用父类的paint方法
         super.paint(graphics)

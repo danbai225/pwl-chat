@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<style>
+    body {
+        margin: 0;
+        font-family: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+        font-size: 14px;
+        color: #263859;
+        background-color: rgb(60, 63, 65);
+    }
+
+    .module {
+        margin-bottom: 20px;
+        border-radius: 3px;
+        width: 100%;
+        word-wrap: break-word;
+        box-sizing: border-box;
+        min-width: 1px;
+    }
+
+    .fn-flex, .fn__flex {
+        display: flex;
+    }
+
+    .chats__content {
+        background-color: #6B778D;
+        border-radius: 5px;
+        padding: 8px 15px;
+        margin: 0 20px 15px 15px;
+        overflow: initial;
+        max-width: 85%;
+        box-sizing: border-box;
+    }
+
+    .chats__arrow {
+        position: relative;
+    }
+
+    .ft__fade {
+        color: #263859;
+    }
+
+    .ft__smaller {
+        font-size: 12px;
+    }
+
+    .vditor-reset {
+        color: #24292e;
+        font-variant-ligatures: no-common-ligatures;
+        font-family: "Helvetica Neue", "Luxi Sans", "DejaVu Sans", Tahoma, "Hiragino Sans GB", "Microsoft Yahei", sans-serif;
+        word-wrap: break-word;
+        overflow: auto;
+        line-height: 1.5;
+        font-size: 16px;
+        word-break: break-word;
+    }
+
+    .fn__right {
+        float: right;
+    }
+
+    .fn__left {
+        float: left;
+    }
+
+    .chats__item--me {
+        flex-direction: row-reverse;
+    }
+
+    img.emoji {
+        cursor: auto;
+        max-width: 20px;
+        vertical-align: sub;
+    }
+
+    .chats__item .avatar {
+        margin-right: 0;
+    }
+
+    .avatar {
+        height: 38px;
+        width: 38px;
+        margin-right: 10px;
+    }
+
+    .avatar, .avatar-small, .avatar-middle, .avatar-mid, .avatar-big {
+        border-radius: 3px 3px 3px 3px;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+        display: inline-block;
+        vertical-align: middle;
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    .chats__arrow:after {
+        position: absolute;
+        width: 0;
+        height: 0;
+        content: "";
+        top: 5px;
+        left: -25px;
+        border: 5px solid transparent;
+        border-right: 5px solid #24292e;
+    }
+
+    .chats__item--me .chats__content .chats__arrow:after {
+        right: -25px;
+        border-left-color: #24292e;
+        left: auto;
+        border-right-color: transparent;
+    }
+
+    p {
+        margin: 0;
+    }
+</style>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<div class="" style="display: block;">
+    <div class="fn__flex chats__item chats__item--me">
+        <div class="avatar tooltipped__user" aria-label="danbai"
+             style="background-image: url('https://danbai.oss-cn-chengdu.aliyuncs.com/bk/wallhaven-43q669_1631340831671.jpeg?x-oss-process=style/blog');"></div>
+        <div class="chats__content">
+            <div class="chats__arrow"></div>
+            <div class="vditor-reset ft__smaller  blur">
+                <p>test</p>
+            </div>
+            <div class="ft__smaller ft__fade fn__right">
+                2021-11-27 20:24:50
+            </div>
+        </div>
+    </div>
+</div>
+<div style="display: block;">
+    <div class="fn__flex chats__item">
+        <div class="avatar tooltipped__user"
+             style="background-image: url('https://danbai.oss-cn-chengdu.aliyuncs.com/bk/wallhaven-43q669_1631340831671.jpeg?x-oss-process=style/blog');"></div>
+        <div class="chats__content">
+            <div class="chats__arrow"></div>
+            <div class="ft__fade ft__smaller" style="padding-bottom: 3px;border-bottom: 1px solid #263859">
+                <span class="ft-gray">Yui</span>
+            </div>
+            <div class="vditor-reset ft__smaller  blur">
+                <p>今天好累</p>
+            </div>
+            <div class="ft__smaller ft__fade fn__right">
+                2021-11-27 20:18:05
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

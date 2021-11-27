@@ -4,7 +4,7 @@ import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
 object StringUtils {
-    fun  md5(input: String?): String? {
+    fun md5(input: String?): String? {
         if (input == null || input.length == 0) {
             return null
         }

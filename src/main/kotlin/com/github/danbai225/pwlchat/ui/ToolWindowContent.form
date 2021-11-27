@@ -74,20 +74,7 @@
                         </constraints>
                         <properties/>
                         <border type="none"/>
-                        <children>
-                          <component id="e9409" class="javax.swing.JTextPane" binding="oChat">
-                            <constraints/>
-                            <properties>
-                              <editable value="false"/>
-                              <text value=""/>
-                            </properties>
-                            <clientProperties>
-                              <JEditorPane.w3cLengthUnits class="java.lang.Boolean" value="false"/>
-                              <charset class="java.lang.String" value=""/>
-                              <html.disable class="java.lang.Boolean" value="false"/>
-                            </clientProperties>
-                          </component>
-                        </children>
+                        <children/>
                       </scrollpane>
                       <grid id="e0eb3" layout-manager="BorderLayout" hgap="0" vgap="0">
                         <constraints>

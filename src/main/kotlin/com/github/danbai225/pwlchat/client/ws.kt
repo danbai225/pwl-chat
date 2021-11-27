@@ -4,12 +4,11 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
 import java.net.URI
 import java.nio.ByteBuffer
 
-class ws: WebSocketClient(URI.create(Client.PWL_WSS)){
-    var client:Client?=null
+class ws : WebSocketClient(URI.create(Client.PWL_WSS)) {
+    var client: Client? = null
 
     override fun onOpen(handshakedata: ServerHandshake?) {
         logger.info("new connection opened")
