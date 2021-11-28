@@ -61,21 +61,13 @@
                   <splitpane id="ab868">
                     <constraints border-constraint="Center"/>
                     <properties>
-                      <dividerLocation value="241"/>
+                      <dividerLocation value="100"/>
                       <dividerSize value="5"/>
                       <enabled value="true"/>
                       <resizeWeight value="0.5"/>
                     </properties>
                     <border type="none"/>
                     <children>
-                      <scrollpane id="f5e3d" binding="consoleScroll">
-                        <constraints>
-                          <splitpane position="right"/>
-                        </constraints>
-                        <properties/>
-                        <border type="none"/>
-                        <children/>
-                      </scrollpane>
                       <grid id="e0eb3" layout-manager="BorderLayout" hgap="0" vgap="0">
                         <constraints>
                           <splitpane position="left"/>
@@ -102,6 +94,14 @@
                             </children>
                           </scrollpane>
                         </children>
+                      </grid>
+                      <grid id="140c4" binding="oChatPanel" layout-manager="BorderLayout" hgap="0" vgap="0">
+                        <constraints>
+                          <splitpane position="right"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children/>
                       </grid>
                     </children>
                   </splitpane>

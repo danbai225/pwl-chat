@@ -35,7 +35,6 @@ class Client {
     private var onlineVitality = 0.0
     private var pkList: ArrayList<String> = ArrayList()
     private var lastOid: String? = ""
-    var consoleScroll: JScrollPane? = null
     var project: Project? = null
     var userlist: JList<String>? = null
     var userLabel: JLabel? = null
@@ -46,7 +45,6 @@ class Client {
         load()
         connect()
         val timer = timer("定时Thread_name", false, 2000, 1000) {
-            gotoConsoleLow()
             if (ws?.isClosed == true) {
                 oChat?.addInfoToOChat("ws", "连接已断开")
                 connect()
@@ -257,7 +255,16 @@ class Client {
         }
         return ""
     }
-
+    fun more(page:Int){
+        get(PWL_MORE+"?page=$page&_=${System.currentTimeMillis().toString()}")?.execute().use {
+            val msg = Gson().fromJson(it?.body()?.string(), More::class.java)
+            var a=msg.data?.sortedBy { m->m.time }
+            a?.forEach { m->
+                m.type="msg"
+                onMessage(Gson().toJson(m))
+            }
+        }
+    }
     /**
      * WebSocket实现区
      */
@@ -312,16 +319,6 @@ class Client {
         //给到绘制消息方法
         oChat?.addMsgToOChat(msg)
     }
-
-    /**
-     * UI控制区
-     */
-    @Synchronized
-    private fun gotoConsoleLow() {
-        consoleScroll?.verticalScrollBar?.value = consoleScroll?.verticalScrollBar?.maximum!!
-        consoleScroll?.updateUI()
-    }
-
     private fun sendNotify(title: String, content: String, type: NotificationType) {
         project?.let { com.github.danbai225.pwlchat.notify.sendNotify(it, title, content, type) }
     }
@@ -338,6 +335,7 @@ class Client {
         private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
         private const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
         private const val PWL_UPLOAD = "https://pwl.icu/upload"
+        private const val PWL_MORE="https://pwl.icu/chat-room/more"
         private val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
         private val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }

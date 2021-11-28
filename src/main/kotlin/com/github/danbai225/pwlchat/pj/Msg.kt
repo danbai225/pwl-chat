@@ -4,7 +4,7 @@ class Msg {
     var md: String? = null
     var userAvatarURL: String? = null
     var userNickname: String? = null
-    var time: String? = null
+    var time: String = ""
     var oId: String? = null
     var userName: String = ""
     var type: String? = null

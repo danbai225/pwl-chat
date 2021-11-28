@@ -30,8 +30,8 @@ class ToolWindowContent(p: Project?) : JPanel() {
     var send: JButton? = null
     var iChat: JTextArea? = null
     var oChat: oChat? = null
+    var oChatPanel: JPanel? = null
     var client: Client? = Client()
-    var consoleScroll: JScrollPane? = null
     var userLabel: JLabel? = null
     var draw: JPanel? = null
     var userlist: JList<String>? = null
@@ -109,7 +109,8 @@ class ToolWindowContent(p: Project?) : JPanel() {
                         TextChat()
                     }
                     oChat = chat
-                    consoleScroll?.setViewportView(chat.getComponent())
+                    oChatPanel?.removeAll()
+                    oChatPanel?.add(chat.getComponent(),BorderLayout.CENTER)
                     client?.setOChatApi(oChat!!)
                 }
                 return
@@ -117,7 +118,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
         }
         msg?.let { client?.sendMsg(it) }
     }
-
     private fun component() {
         //自身属性
         layout = BorderLayout()
@@ -132,12 +132,12 @@ class ToolWindowContent(p: Project?) : JPanel() {
             TextChat()
         }
         oChat = chat
-        consoleScroll?.setViewportView(chat.getComponent())
-
+        oChatPanel?.removeAll()
+        oChatPanel?.add(chat.getComponent(),BorderLayout.CENTER)
+        client?.setOChatApi(oChat!!)
         //pwl客户端
         client?.project = project
         client?.setOChatApi(oChat!!)
-        client?.consoleScroll = consoleScroll
         client?.userLabel = userLabel
         client?.userlist=userlist
         if (client?.verifyLogin() == true) {

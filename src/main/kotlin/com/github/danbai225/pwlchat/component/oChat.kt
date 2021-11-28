@@ -10,4 +10,5 @@ interface oChat {
     fun addInfoToOChat(op: String, msg: String)
     fun getComponent(): JComponent
     fun setClient(client: Client)
+    fun loadHistory(boolean: Boolean) :Boolean
 }

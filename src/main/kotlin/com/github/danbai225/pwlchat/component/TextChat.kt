@@ -12,14 +12,24 @@ import java.awt.BorderLayout
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.JComponent
+import javax.swing.JScrollPane
 import javax.swing.JTextPane
 
-open class TextChat : JTextPane(), oChat {
+class TextChat : JScrollPane(), oChat {
+    private var loadHistory:Boolean=false
+    var oChat:JTextPane=JTextPane()
+    var clientApi:Client?=null
     init {
-        layout = BorderLayout()
+        oChat.layout = BorderLayout()
+        setViewportView(oChat)
+        oChat.isEditable=false
     }
-
     private var lines = 0
+    @Synchronized
+    private fun gotoConsoleLow() {
+        verticalScrollBar?.value = verticalScrollBar?.maximum!!
+        updateUI()
+    }
     override fun addMsgToOChat(msg: Msg) {
         when (msg.type) {
             "msg" -> {
@@ -27,14 +37,14 @@ open class TextChat : JTextPane(), oChat {
                     //红包消息
                     val red =
                         Gson().fromJson(msg.content, RedPack::class.java)
-                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName)
+                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName,msg.time)
                 } else {
                     val doc: Document = Jsoup.parse(msg.content)
                     var m = doc.text()
                     if (m.isEmpty()) {
                         m = "(表情.jpg)"
                     }
-                    addMsgToOChat(m, msg.userName)
+                    addMsgToOChat(m, msg.userName,msg.time)
                 }
                 linesADD()
             }
@@ -48,32 +58,42 @@ open class TextChat : JTextPane(), oChat {
 
     override fun addErrToOChat(op: String, msg: String) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
-        text += "[Err-$time] $op: $msg\n"
+        oChat.text += "[Err-$time] $op: $msg\n"
+        gotoConsoleLow()
     }
 
     override fun addInfoToOChat(op: String, msg: String) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
-        text += "[Info-$time] $op: $msg\n"
+        oChat.text += "[Info-$time] $op: $msg\n"
+        gotoConsoleLow()
     }
 
     override fun getComponent(): JComponent {
         return this
     }
     override fun setClient(client: Client) {
-
+        clientApi=client
+        clientApi?.more(1)
     }
 
-    private fun addMsgToOChat(msg: String?, UserName: String?) {
-        val time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
-        text += "[$time] $UserName: $msg\n"
+    override fun loadHistory(boolean: Boolean):Boolean {
+        if (boolean){
+            loadHistory=true
+        }
+        return loadHistory
+    }
+
+    private fun addMsgToOChat(msg: String?, UserName: String?,time:String) {
+        oChat.text += "[$time] $UserName: $msg\n"
+        gotoConsoleLow()
     }
 
     private fun linesADD() {
         lines++
         if (lines > 200) {
-            val split = text?.split("\n")
+            val split = oChat.text?.split("\n")
             val newText = split?.slice(split.size.minus(100)..split.size.minus(1))
-            text = newText?.joinToString(separator = "\n")
+            oChat.text = newText?.joinToString(separator = "\n")
             lines = newText?.size!!
         }
     }
