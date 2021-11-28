@@ -120,7 +120,61 @@
     p {
         margin: 0;
     }
+
+    svg {
+        fill: currentColor;
+        display: inline-block;
+        stroke-width: 0;
+        stroke: currentColor;
+        width: 14px;
+        height: 14px;
+    }
+
+    .hongbao__item {
+
+        color: #3A3A59;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 3px;
+        box-shadow: 0 1px 2px;
+        margin: 3px 5px 8px 3px;
+    }
+
+    .fn__flex-inline {
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .hongbao__icon {
+        height: 34px !important;
+        width: 34px !important;
+        margin-right: 5px;
+    }
+    .chats__content .vditor-reset img:not(.emoji) {
+        max-width: 150px;
+        max-height: 300px;
+    }
+    .blur img {
+        -webkit-filter: blur(20px) saturate(1.4);
+        filter: blur(20px) saturate(1.4);
+        transition: all .15s ease-in-out;
+    }
+    .blur img:hover {
+        filter: none;
+        -webkit-filter: none;
+    }
+    .hongbao__item:hover {
+        box-shadow: 0 0 3px rgb(0 0 0 / 13%), 0 3px 6px rgb(0 0 0 / 26%);
+    }
 </style>
+<svg style="height: 0">
+    <symbol id="redPacketIcon" viewBox="0 0 1024 1024">
+        <path d="M705.2 445.28C689.12 536.48 608.608 606.256 512 606.256c-91.232 0-171.728-64.4-187.84-150.272l-134.16-80.496V783.36c0 59.04 48.304 101.968 101.968 101.968h440.064c59.04 0 101.968-48.288 101.968-101.968V370.128l-128.8 75.136zM512 219.856c91.232 0 166.368 64.4 187.84 150.256l134.16-85.856v-48.304c0-59.04-48.304-101.968-101.968-101.968H291.968c-53.664 0-101.968 42.928-101.968 101.968v59.04l134.16 80.48c16.112-91.216 96.608-155.616 187.84-155.616z"
+              fill="#E60000"></path>
+        <path d="M565.664 434.528h-26.832v-21.456h26.832c16.112 0 26.832-10.736 26.832-26.832 0-16.112-10.72-26.848-26.832-26.848h-16.096l32.208-32.192c10.72-10.72 10.72-26.832 0-37.568-10.736-10.72-26.848-10.72-37.568 0L512 327.2l-32.192-37.568c-10.736-10.72-26.848-10.72-37.568 0-10.736 10.72-10.736 26.832 0 37.568l32.192 32.192h-16.096c-16.096 0-26.832 10.736-26.832 26.848 0 16.096 10.72 26.832 26.832 26.832h32.192v21.456h-32.192c-16.096 0-26.832 10.736-26.832 26.832 0 16.112 10.72 26.848 26.832 26.848h32.192v37.568c0 16.096 10.736 26.816 26.848 26.816 16.096 0 26.832-10.72 26.832-26.816v-37.568h21.456c16.112 0 26.832-10.736 26.832-26.848 0-16.096-10.72-26.832-26.832-26.832z"
+              fill="#E60000" opacity=".4"></path>
+    </symbol>
+</svg>
 <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <div class="" style="display: block;">
     <div class="fn__flex chats__item chats__item--me">
@@ -154,6 +208,57 @@
             </div>
         </div>
     </div>
+</div>
+<div style="color: #FF7777;margin-bottom: 10px;text-align: center;">
+    <svg>
+        <use xlink:href="#redPacketIcon"></use>
+    </svg>
+    <span>&nbsp;danbai 抢到了 danbai 的 红包 (1/2)</span>
+</div>
+<div style="display: block;">
+    <div class="fn__flex chats__item">
+        <div class="avatar tooltipped__user"
+             style="background-image: url('https://danbai.oss-cn-chengdu.aliyuncs.com/bk/wallhaven-43q669_1631340831671.jpeg?x-oss-process=style/blog');"></div>
+        <div class="chats__content">
+            <div class="chats__arrow">
+            </div>
+            <div style="margin-top: 4px" class="vditor-reset ft__smaller  blur">
+                <div class="hongbao__item fn__flex-inline" onclick="$(this).attr('onclick','');openRedPacket('1638073815586')">
+                    <svg class="ft__red hongbao__icon">
+                        <use xlink:href="#redPacketIcon"></use>
+                    </svg>
+                    <div>
+                        <div>摸鱼者，事竟成！</div>
+                        <div class="ft__smaller ft__fade redPacketDesc">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ft__smaller ft__fade fn__right">
+                2021-11-27 20:18:05
+            </div>
+        </div>
+    </div>
+</div>
+<div class="" style="display: block;"><div id="chatroom1638077189763" class="fn__flex chats__item chats__item--me">
+    <a href="/member/danbai" style="height: 38px">
+        <div class="avatar tooltipped__user" aria-label="danbai" style="background-image: url('https://pwl.stackoverflow.wiki/2021/09/1668857439-fb4a43be.gif');"></div>
+    </a>
+    <div class="chats__content">
+        <div class="chats__arrow"></div>
+        <div style="margin-top: 4px" class="vditor-reset ft__smaller  blur">
+            <p><img src="https://wallpapercave.com/wp/wp3850825.jpg" alt="69+ 4K Abstract Wallpapers"></p><span id="plusOne" onclick="ChatRoom.plusOne()"><svg style="width: 20px; height: 20px; cursor: pointer;"><use xlink:href="#plusOneIcon"></use></svg></span>
+        </div>
+        <div class="ft__smaller ft__fade fn__right">
+            2021-11-28 13:26:29
+        </div>
+    </div>
+</div></div>
+<div style="color: #EEE;margin-bottom: 10px;text-align: center;">
+    <span>Info</span>
+</div>
+<div style="color: #FA4659;margin-bottom: 10px;text-align: center;">
+    <span>ERR</span>
 </div>
 </body>
 </html>

@@ -1,10 +1,13 @@
 package com.github.danbai225.pwlchat.component
 
+import com.github.danbai225.pwlchat.client.Client
 import com.github.danbai225.pwlchat.pj.Msg
 import com.github.danbai225.pwlchat.pj.RedPack
 import com.google.gson.Gson
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.text.SimpleDateFormat
 import java.util.*
@@ -12,8 +15,6 @@ import javax.swing.JComponent
 import javax.swing.JTextPane
 
 open class TextChat : JTextPane(), oChat {
-    private var currentUserName = ""
-
     init {
         layout = BorderLayout()
     }
@@ -45,10 +46,6 @@ open class TextChat : JTextPane(), oChat {
         }
     }
 
-    override fun setCurrentUserName(username: String) {
-        currentUserName = username
-    }
-
     override fun addErrToOChat(op: String, msg: String) {
         val time = SimpleDateFormat("HH:mm:ss").format(Date())
         text += "[Err-$time] $op: $msg\n"
@@ -61,6 +58,9 @@ open class TextChat : JTextPane(), oChat {
 
     override fun getComponent(): JComponent {
         return this
+    }
+    override fun setClient(client: Client) {
+
     }
 
     private fun addMsgToOChat(msg: String?, UserName: String?) {
@@ -76,5 +76,8 @@ open class TextChat : JTextPane(), oChat {
             text = newText?.joinToString(separator = "\n")
             lines = newText?.size!!
         }
+    }
+    companion object{
+        private val logger: Logger = LoggerFactory.getLogger(TextChat::class.java)
     }
 }

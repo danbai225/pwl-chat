@@ -35,7 +35,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
     var userLabel: JLabel? = null
     var draw: JPanel? = null
     var userlist: JList<String>? = null
-    private var userListModel: DefaultListModel<String>? = null
     private var project: Project? = p
     private var history: ArrayDeque<String> = ArrayDeque(4)
     private var WebView: Boolean = false
@@ -111,8 +110,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
                     }
                     oChat = chat
                     consoleScroll?.setViewportView(chat.getComponent())
-                    client?.oChat = oChat
-                    client?.userName?.let { oChat?.setCurrentUserName(it) }
+                    client?.setOChatApi(oChat!!)
                 }
                 return
             }
@@ -124,9 +122,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
         //自身属性
         layout = BorderLayout()
         add(root, BorderLayout.CENTER)
-        //在线列表
-        userListModel = DefaultListModel()
-        userlist?.model = userListModel
         //聊天渲染
         PropertiesComponent.getInstance().getBoolean("pwl_web").let {
             WebView = it
@@ -141,10 +136,10 @@ class ToolWindowContent(p: Project?) : JPanel() {
 
         //pwl客户端
         client?.project = project
-        client?.oChat = oChat
+        client?.setOChatApi(oChat!!)
         client?.consoleScroll = consoleScroll
-        client?.userListModel = userListModel
         client?.userLabel = userLabel
+        client?.userlist=userlist
         if (client?.verifyLogin() == true) {
             send?.text = "send"
         }

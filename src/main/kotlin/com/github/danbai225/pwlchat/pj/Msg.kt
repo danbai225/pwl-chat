@@ -6,7 +6,7 @@ class Msg {
     var userNickname: String? = null
     var time: String? = null
     var oId: String? = null
-    var userName: String? = null
+    var userName: String = ""
     var type: String? = null
     var content: String = ""
     var onlineChatCnt = 0
@@ -14,6 +14,7 @@ class Msg {
     var msg: String? = null
     var whoGot: String? = null
     var whoGive: String? = null
-    var got: String? = null
+    var count = 0
+    var got = 0
     var code = 0
 }

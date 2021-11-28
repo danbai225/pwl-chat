@@ -34,7 +34,6 @@ class PwlCefResourceRequestHandler : CefRequestHandlerAdapter(), CefResourceRequ
         val headerMap: HashMap<String, String> = HashMap()
         p2?.getHeaderMap(headerMap)
         headerMap["referer"] = "https://pwl.icu/";
-        println(headerMap.size)
         p2?.setHeaderMap(headerMap)
         return false
     }

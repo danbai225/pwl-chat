@@ -8,6 +8,7 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.use
+import com.sun.jna.StringArray
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import javax.swing.DefaultListModel
 import javax.swing.JLabel
+import javax.swing.JList
 import javax.swing.JScrollPane
 import kotlin.concurrent.timer
 
@@ -35,7 +37,7 @@ class Client {
     private var lastOid: String? = ""
     var consoleScroll: JScrollPane? = null
     var project: Project? = null
-    var userListModel: DefaultListModel<String>? = null
+    var userlist: JList<String>? = null
     var userLabel: JLabel? = null
     var oChat: oChat? = null
     private var ws: ws? = null
@@ -85,6 +87,11 @@ class Client {
         PropertiesComponent.getInstance().setValue("pwl_eventLog", eventLog)
     }
 
+    fun setOChatApi(o: oChat) {
+        this.oChat = o
+        this.oChat?.setClient(this)
+    }
+
     /**
      * HTTP方法区
      */
@@ -107,7 +114,7 @@ class Client {
         return client.newCall(request)
     }
 
-    fun get(url: String): Call? {
+    private fun get(url: String): Call? {
         val request: Request = Request.Builder()
             .url(url)
             .addHeader("Cookie", cookie)
@@ -128,7 +135,6 @@ class Client {
                     val msg = Gson().fromJson(response?.body()?.string(), Liveness::class.java)
                     onlineVitality = msg.liveness
                     isLogin = true
-                    userName?.let { oChat?.setCurrentUserName(it) }
                     return true
                 }
             }
@@ -172,14 +178,18 @@ class Client {
                 val selectedSeries = pkList.toMutableList()
                 pkList.clear()
                 selectedSeries.forEach {
-                    post(PWL_OPEN, "{\"oId\":\"$it\"}")?.execute().use { rs ->
-                        val res = Gson().fromJson(rs?.body()?.string(), RedPack::class.java)
-                        res.who?.forEach { r ->
-                            if (r.userName == userName) {
-                                oChat?.addInfoToOChat("openPacket", "你抢到了${res.info?.userName}的红包,${r.userMoney}$")
-                            }
-                        }
-                    }
+                    openPacket(it)
+                }
+            }
+        }
+    }
+
+    fun openPacket(oid: String) {
+        post(PWL_OPEN, "{\"oId\":\"$oid\"}")?.execute().use { rs ->
+            val res = Gson().fromJson(rs?.body()?.string(), RedPack::class.java)
+            res.who?.forEach { r ->
+                if (r.userName == userName) {
+                    oChat?.addInfoToOChat("openPacket", "你抢到了${res.info?.userName}的红包,${r.userMoney}$")
                 }
             }
         }
@@ -258,7 +268,7 @@ class Client {
     }
 
     fun onMessage(message: String) {
-        //println("received message: $message")
+        //logger.info("received message: $message")
         val msg =
             Gson().fromJson(message, Msg::class.java)
         when (msg.type) {
@@ -275,14 +285,27 @@ class Client {
                     if (msg.userName == userName) {
                         lastOid = msg.oId
                     }
+                    if(eventLog){
+                        var a:String?=""
+                        while (a?.length!! <(msg?.content?.length?.div(4)!!)){
+                            a+=" "
+                        }
+                        sendNotify(msg.userName!!, msg.content!!+" "+a, NotificationType.INFORMATION)
+                    }
                 }
             }
             "online" -> {
                 online = msg.onlineChatCnt
-                userListModel?.clear()
-                msg.users?.forEach { user ->
-                    userListModel?.addElement(user.userName)
+                var users=msg.users?.sortedBy { it.userName }
+                val array = users?.size?.let { arrayOfNulls<String>(it) }
+                users?.size.let {
+                    if (it != null) {
+                        for (i in 0 until it) {
+                            array?.set(i, users?.get(i)?.userName)
+                        }
+                    }
                 }
+                userlist?.setListData(array)
                 userLabel?.text = "Online ${msg.users?.size}"
             }
         }
@@ -294,7 +317,7 @@ class Client {
      * UI控制区
      */
     @Synchronized
-    fun gotoConsoleLow() {
+    private fun gotoConsoleLow() {
         consoleScroll?.verticalScrollBar?.value = consoleScroll?.verticalScrollBar?.maximum!!
         consoleScroll?.updateUI()
     }
@@ -309,14 +332,14 @@ class Client {
     //teyxBFF7JjkXHv
     companion object {
         const val PWL_WSS = "wss://pwl.icu/chat-room-channel"
-        const val PWL_LOGIN = "https://pwl.icu/login"
-        const val PWL_LIVE = "https://pwl.icu/user/liveness"
-        const val PWL_SEND = "https://pwl.icu/chat-room/send"
-        const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
-        const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
-        const val PWL_UPLOAD = "https://pwl.icu/upload"
-        val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
-        val logger: Logger = LoggerFactory.getLogger(Client::class.java)
+        private const val PWL_LOGIN = "https://pwl.icu/login"
+        private const val PWL_LIVE = "https://pwl.icu/user/liveness"
+        private const val PWL_SEND = "https://pwl.icu/chat-room/send"
+        private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
+        private const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
+        private const val PWL_UPLOAD = "https://pwl.icu/upload"
+        private val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
+        private val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }
 
 }
