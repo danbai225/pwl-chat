@@ -4,9 +4,7 @@
 
 ## [Unreleased]
 
-### 0.0.7
-- webview
-- webview事件处理
-- 在线列表
-- 代码结构调整
-- fixBug
+## [0.0.8]
+- 数组越界
+- 历史命令缓存数增加到20
+- web下info信息\n替换为br

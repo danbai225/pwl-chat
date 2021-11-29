@@ -89,7 +89,7 @@ class WebChat : JBCefBrowser(), oChat {
     }
 
     override fun addInfoToOChat(op: String, msg: String) {
-        addHtml(String.format(InfoFmt,"$op-$msg"))
+        addHtml(String.format(InfoFmt,"$op-${msg.replace("\n","<br>")}"))
     }
 
     override fun setClient(client: Client) {

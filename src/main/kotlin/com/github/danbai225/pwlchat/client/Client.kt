@@ -297,7 +297,7 @@ class Client {
                         while (a?.length!! <(msg?.content?.length?.div(4)!!)){
                             a+=" "
                         }
-                        sendNotify(msg.userName!!, msg.content!!+" "+a, NotificationType.INFORMATION)
+                        sendNotify(msg.userName!!, msg.content!!+"    "+a, NotificationType.INFORMATION)
                     }
                 }
             }

@@ -65,7 +65,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
             }
         }
         val msg = iChat?.text
-        if (history.size > 10) {
+        if (history.size >= 20) {
             history.removeFirst()
         }
         msg?.let { history.addLast(it) }
@@ -82,6 +82,10 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 return
             }
             "#packet", "#红包" -> {
+                if (split.size<4){
+                    oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
+                    return
+                }
                 client?.packet(split[1].toInt(), split[2].toInt(), split[3])
                 return
             }
@@ -95,11 +99,19 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 return
             }
             "#eventlog", "#事件输出" -> {
+                if (split.size<2){
+                    oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
+                    return
+                }
                 client?.eventLog = split[1].toInt() == 1
                 client?.save()
                 return
             }
             "#web" -> {
+                if (split.size<2){
+                    oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
+                    return
+                }
                 PropertiesComponent.getInstance().setValue("pwl_web", split[1].toInt() == 1)
                 if ((split[1].toInt() == 1) != WebView) {
                     WebView = (split[1].toInt() == 1)
