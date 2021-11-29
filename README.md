@@ -59,6 +59,15 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
   Download the [latest release](https://github.com/danbai225/pwl-chat/releases/latest) and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
+## 已知BUG
+
+- 输入框输入参数空时报错 `java.lang.NumberFormatException: For input string: ""`
+
+## TODO
+
+- 引用
+- web页撤回
+- draw接口
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
