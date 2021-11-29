@@ -8,17 +8,14 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.use
-import com.sun.jna.StringArray
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
-import javax.swing.DefaultListModel
 import javax.swing.JLabel
 import javax.swing.JList
-import javax.swing.JScrollPane
 import kotlin.concurrent.timer
 
 class Client {
@@ -44,7 +41,7 @@ class Client {
     init {
         load()
         connect()
-        val timer = timer("定时Thread_name", false, 2000, 1000) {
+        timer("定时Thread_name", false, 2000, 1000) {
             if (ws?.isClosed == true) {
                 oChat?.addInfoToOChat("ws", "连接已断开")
                 connect()
@@ -130,7 +127,7 @@ class Client {
             val get = get(PWL_LIVE)
             get?.execute().use { response ->
                 if (response?.code() == 200) {
-                    val msg = Gson().fromJson(response?.body()?.string(), Liveness::class.java)
+                    val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
                     onlineVitality = msg.liveness
                     isLogin = true
                     return true
@@ -256,9 +253,9 @@ class Client {
         return ""
     }
     fun more(page:Int){
-        get(PWL_MORE+"?page=$page&_=${System.currentTimeMillis().toString()}")?.execute().use {
+        get(PWL_MORE+"?page=$page&_=${System.currentTimeMillis()}")?.execute().use {
             val msg = Gson().fromJson(it?.body()?.string(), More::class.java)
-            var a=msg.data?.sortedBy { m->m.time }
+            val a=msg.data?.sortedBy { m->m.time }
             a?.forEach { m->
                 m.type="msg"
                 onMessage(Gson().toJson(m))
@@ -297,18 +294,18 @@ class Client {
                         while (a?.length!! <(msg?.content?.length?.div(4)!!)){
                             a+=" "
                         }
-                        sendNotify(msg.userName!!, msg.content!!+"    "+a, NotificationType.INFORMATION)
+                        sendNotify(msg.userName, msg.content +"    "+a, NotificationType.INFORMATION)
                     }
                 }
             }
             "online" -> {
                 online = msg.onlineChatCnt
-                var users=msg.users?.sortedBy { it.userName }
+                val users=msg.users?.sortedBy { it.userName }
                 val array = users?.size?.let { arrayOfNulls<String>(it) }
                 users?.size.let {
                     if (it != null) {
                         for (i in 0 until it) {
-                            array?.set(i, users?.get(i)?.userName)
+                            array?.set(i, users.get(i).userName)
                         }
                     }
                 }

@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException
 
 object StringUtils {
     fun md5(input: String?): String? {
-        if (input == null || input.length == 0) {
+        if (input == null || input.isEmpty()) {
             return null
         }
         try {

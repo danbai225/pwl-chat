@@ -9,17 +9,11 @@ import com.github.danbai225.pwlchat.pj.RedPack
 import com.google.gson.Gson
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefJSQuery
-import okhttp3.OkHttpClient
-import org.cef.CefApp
-import org.cef.CefSettings
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
-import org.cef.callback.CefSchemeHandlerFactory
-import org.cef.callback.CefSchemeRegistrar
 import org.cef.handler.CefLoadHandlerAdapter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -43,6 +37,7 @@ class WebChat : JBCefBrowser(), oChat {
     private fun callBackJs(){
         //打开红包
         val openRedPacket=JBCefJSQuery.create(this)
+
         openRedPacket.addHandler { args: String ->
             clientApi?.openPacket(args)
             JBCefJSQuery.Response("ok")

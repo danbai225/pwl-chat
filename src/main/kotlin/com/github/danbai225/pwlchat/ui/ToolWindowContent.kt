@@ -82,7 +82,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 return
             }
             "#packet", "#红包" -> {
-                if (split.size<4){
+                if (split.size<4||split[1].isEmpty()||split[2].isEmpty()){
                     oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
                     return
                 }
@@ -99,7 +99,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 return
             }
             "#eventlog", "#事件输出" -> {
-                if (split.size<2){
+                if (split.size<2||split[1].isEmpty()){
                     oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
                     return
                 }
@@ -108,7 +108,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 return
             }
             "#web" -> {
-                if (split.size<2){
+                if (split.size<2||split[1].isEmpty()){
                     oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
                     return
                 }

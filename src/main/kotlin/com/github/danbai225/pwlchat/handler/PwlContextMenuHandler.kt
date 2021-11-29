@@ -15,7 +15,7 @@ class PwlContextMenuHandler() : CefContextMenuHandler {
        wb=w
     }
     override fun onBeforeContextMenu(p0: CefBrowser?, p1: CefFrame?, p2: CefContextMenuParams?, p3: CefMenuModel?) {
-        p3?.clear();//清除默认的菜单项
+        p3?.clear()//清除默认的菜单项
         p3?.addItem(CefMenuModel.MenuId.MENU_ID_USER_LAST, "Open DevTools")
         p3?.addItem(RefreshEmptyID, "RefreshEmpty")
     }
