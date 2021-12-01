@@ -15,6 +15,7 @@ import javax.swing.JComponent
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
 
+
 class TextChat : JScrollPane(), oChat {
     private var loadHistory:Boolean=false
     var oChat:JTextPane=JTextPane()
@@ -27,8 +28,9 @@ class TextChat : JScrollPane(), oChat {
     private var lines = 0
     @Synchronized
     private fun gotoConsoleLow() {
-        verticalScrollBar?.value = verticalScrollBar?.maximum!!
-        updateUI()
+        oChat.caretPosition = oChat.document.length;
+//        verticalScrollBar?.value = verticalScrollBar?.maximum!!
+//        updateUI()
     }
     override fun addMsgToOChat(msg: Msg) {
         when (msg.type) {
@@ -81,6 +83,14 @@ class TextChat : JScrollPane(), oChat {
             loadHistory=true
         }
         return loadHistory
+    }
+
+    override fun clear() {
+        oChat.text=""
+    }
+
+    override fun close() {
+        isEnabled = true
     }
 
     private fun addMsgToOChat(msg: String?, UserName: String?,time:String) {

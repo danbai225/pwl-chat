@@ -77,7 +77,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 oChat?.addInfoToOChat(
                     "help",
                     "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n#revoke - 撤回最后一条发送的消息\n#exit - 退出登陆\n#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)\n" +
-                            "#web - 切换输出模式 参数1(开启) 0 or 1"
+                            "#web - 切换输出模式 参数1(开启) 0 or 1\n#clear - 清空聊天记录"
                 )
                 return
             }
@@ -120,12 +120,18 @@ class ToolWindowContent(p: Project?) : JPanel() {
                     } else {
                         TextChat()
                     }
+                    if (oChat!=null){
+                        oChat?.close()
+                    }
                     oChat = chat
                     oChatPanel?.removeAll()
                     oChatPanel?.add(chat.getComponent(),BorderLayout.CENTER)
                     client?.setOChatApi(oChat!!)
                 }
                 return
+            }
+            "#clear","#清空"-> {
+                oChat?.clear()
             }
         }
         msg?.let { client?.sendMsg(it) }

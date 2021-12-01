@@ -11,4 +11,6 @@ interface oChat {
     fun getComponent(): JComponent
     fun setClient(client: Client)
     fun loadHistory(boolean: Boolean) :Boolean
+    fun clear()
+    fun close()
 }

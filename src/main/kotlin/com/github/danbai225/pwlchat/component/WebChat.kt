@@ -98,6 +98,14 @@ class WebChat : JBCefBrowser(), oChat {
         return loadHistory
     }
 
+    override fun clear() {
+        loadChatPage()
+    }
+
+    override fun close() {
+        dispose()
+    }
+
     //消息主体
     private fun msgString(msg:Msg): String {
         val self= clientApi?.userName == msg.userName

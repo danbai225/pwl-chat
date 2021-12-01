@@ -8,7 +8,7 @@
 
 <!-- Plugin description -->
 
-This is a [pwl](https://pwl.icu) chat plugin，We are a group of people who love work and the boss.
+This is a connection [pwl](https://pwl.icu) chat plugin.
 
 Enter`#Help`ForHelp
 
@@ -26,8 +26,9 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 `#web` - Switch output mode parameter 1 (open) 0 or 1
 
+`#clear` - ClearChatHistory
 
-这是一个[pwl](https://pwl.icu)聊天插件，我们是一群热爱工作和老板的人。
+这是一个连接[pwl](https://pwl.icu)聊天插件。
 
 输入`#help`获取帮助
 
@@ -45,6 +46,8 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 `#web` - 切换输出模式 参数1(开启) 0 or 1
 
+`#clear` - 清空聊天记录
+
 <!-- Plugin description end -->
 
 ## Installation
@@ -61,11 +64,9 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 ## 已知BUG
 
-- 输入框输入参数空时报错 `java.lang.NumberFormatException: For input string: ""`
-
 ## TODO
 
-- 引用
+- 引用等更多操作
 - web页撤回
 - draw接口
 
