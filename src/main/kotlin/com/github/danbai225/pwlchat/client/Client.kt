@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import javax.swing.JLabel
 import javax.swing.JList
+import javax.swing.JProgressBar
 import kotlin.concurrent.timer
 
 class Client {
@@ -35,6 +36,7 @@ class Client {
     var project: Project? = null
     var userlist: JList<String>? = null
     var userLabel: JLabel? = null
+    var hot : JProgressBar?=null
     var oChat: oChat? = null
     private var ws: ws? = null
 
@@ -129,6 +131,7 @@ class Client {
                 if (response?.code() == 200) {
                     val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
                     onlineVitality = msg.liveness
+                    hot?.value= onlineVitality.toInt()
                     isLogin = true
                     return true
                 }
@@ -176,6 +179,7 @@ class Client {
                     openPacket(it)
                 }
             }
+            verifyLogin()
         }
     }
 

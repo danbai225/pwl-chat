@@ -33,6 +33,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
     var oChatPanel: JPanel? = null
     var client: Client? = Client()
     var userLabel: JLabel? = null
+    var hot :JProgressBar?=null
     var draw: JPanel? = null
     var userlist: JList<String>? = null
     private var project: Project? = p
@@ -158,6 +159,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
         client?.setOChatApi(oChat!!)
         client?.userLabel = userLabel
         client?.userlist=userlist
+        client?.hot=hot
         if (client?.verifyLogin() == true) {
             send?.text = "send"
         }

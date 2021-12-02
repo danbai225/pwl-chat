@@ -49,6 +49,13 @@
                       </component>
                     </children>
                   </scrollpane>
+                  <component id="723c0" class="javax.swing.JProgressBar" binding="hot">
+                    <constraints border-constraint="South"/>
+                    <properties>
+                      <minimumSize width="10" height="10"/>
+                      <preferredSize width="146" height="10"/>
+                    </properties>
+                  </component>
                 </children>
               </grid>
               <grid id="d434c" layout-manager="BorderLayout" hgap="0" vgap="0">
@@ -62,7 +69,7 @@
                     <constraints border-constraint="Center"/>
                     <properties>
                       <dividerLocation value="100"/>
-                      <dividerSize value="5"/>
+                      <dividerSize value="1"/>
                       <enabled value="true"/>
                       <resizeWeight value="0.5"/>
                     </properties>
