@@ -4,8 +4,6 @@
 
 ## [Unreleased]
 
-## [0.0.9]
-- ClearCommand
-- AutomaticBottomIsAbnormal
-- CommandLineParameterIsEmpty
-- MemoryLeak
+## [0.1.0]
+- FixBug
+- Activity bar

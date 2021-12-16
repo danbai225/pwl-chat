@@ -9,11 +9,17 @@ import org.jsoup.nodes.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.beans.PropertyChangeEvent
+import java.beans.VetoableChangeListener
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.JComponent
+import javax.swing.JList
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
+import kotlin.concurrent.timer
 
 
 class TextChat : JScrollPane(), oChat {
@@ -28,9 +34,9 @@ class TextChat : JScrollPane(), oChat {
     private var lines = 0
     @Synchronized
     private fun gotoConsoleLow() {
-        oChat.caretPosition = oChat.document.length;
-//        verticalScrollBar?.value = verticalScrollBar?.maximum!!
-//        updateUI()
+        if (verticalScrollBar.maximum-height-verticalScrollBar.value<100){
+            oChat.caretPosition = oChat.document.length
+        }
     }
     override fun addMsgToOChat(msg: Msg) {
         when (msg.type) {
