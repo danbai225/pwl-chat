@@ -7,6 +7,7 @@ import com.github.danbai225.pwlchat.handler.PwlContextMenuHandler
 import com.github.danbai225.pwlchat.pj.Msg
 import com.github.danbai225.pwlchat.pj.RedPack
 import com.google.gson.Gson
+import com.intellij.ide.util.PropertiesComponent
 import com.intellij.ui.jcef.JBCefBrowser
 import com.intellij.ui.jcef.JBCefJSQuery
 import org.cef.browser.CefBrowser
@@ -14,6 +15,7 @@ import org.cef.browser.CefFrame
 import org.cef.handler.CefLoadHandlerAdapter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -64,7 +66,7 @@ class WebChat : JBCefBrowser(), oChat {
     private fun addHtml(html: String) {
         val html2 = Base64.getEncoder().encodeToString(html.toByteArray())
         cefBrowser.executeJavaScript(
-            """$("#chat").append(decodeURIComponent(escape(window.atob('$html2')))); if ((${'$'}("#chat").height()-document.body.clientHeight-${'$'}(this).scrollTop())<100){window.scrollTo(0, ${'$'}("#chat").height())};""",
+            """$("#chat").append(decodeURIComponent(escape(window.atob('$html2')))); if ((${'$'}("#chat").height()-document.body.clientHeight-${'$'}(this).scrollTop())<333){window.scrollTo(0, ${'$'}("#chat").height())};""",
             "https://pwl.icu/js/main.js",
             0
         )
@@ -77,8 +79,12 @@ class WebChat : JBCefBrowser(), oChat {
                 addHtml(msgString(msg))
             }   //抢红包消息
             "redPacketStatus" -> {
-                val html = msg.whoGive?.let { msg.whoGot?.let { it1 -> openRedPacketString(it1, it,msg.count,msg.got) } }
-                html?.let { addHtml(it) }
+                PropertiesComponent.getInstance().getBoolean("pwl_openMsg").let {
+                    if (!it){
+                        val html = msg.whoGive?.let { msg.whoGot?.let { it1 -> openRedPacketString(it1, it,msg.count,msg.got) } }
+                        html?.let { addHtml(it) }
+                    }
+                }
             }
         }
     }

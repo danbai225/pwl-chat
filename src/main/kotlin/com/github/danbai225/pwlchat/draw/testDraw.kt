@@ -8,12 +8,26 @@ class testDraw : JPanel() {
     override fun paint(graphics: Graphics) {
         // 必须先调用父类的paint方法
         super.paint(graphics)
-        // 用画笔Graphics，在画板JPanel上画一个小人
-        graphics.drawOval(100, 70, 30, 30) // 头部（画圆形）
-        graphics.drawRect(105, 100, 20, 30) // 身体（画矩形）
-        graphics.drawLine(105, 100, 75, 120) // 左臂（画直线）
-        graphics.drawLine(125, 100, 150, 120) // 右臂（画直线）
-        graphics.drawLine(105, 130, 75, 150) // 左腿（画直线）
-        graphics.drawLine(125, 130, 150, 150) // 右腿（画直线）
+
+        graphics.drawLine(100, 50, 135, 120)
+        graphics.drawLine(100, 50, 65, 120)
+
+        graphics.drawLine(135, 120, 125, 115)
+        graphics.drawLine(65, 120, 75, 115)
+
+        graphics.drawLine(125, 115, 160, 165)
+        graphics.drawLine(75, 115, 40, 165)
+
+        graphics.drawLine(160, 165, 130, 150)
+        graphics.drawLine(40, 165, 70, 150)
+
+        graphics.drawLine(130, 150, 170, 185)
+        graphics.drawLine(70, 150, 30, 185)
+
+        graphics.drawLine(170, 185, 95, 190)
+        graphics.drawLine(30, 185, 95, 190)
+
+        graphics.drawRect(95, 190, 10, 50)
+
     }
 }

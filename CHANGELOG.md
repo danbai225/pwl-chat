@@ -4,6 +4,6 @@
 
 ## [Unreleased]
 
-## [0.1.0]
+## [0.1.1]
 - FixBug
-- Activity bar
+- openMsg switch

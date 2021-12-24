@@ -4,48 +4,62 @@ import com.github.danbai225.pwlchat.client.Client
 import com.github.danbai225.pwlchat.pj.Msg
 import com.github.danbai225.pwlchat.pj.RedPack
 import com.google.gson.Gson
+import com.intellij.ide.util.PropertiesComponent
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
-import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.beans.PropertyChangeEvent
-import java.beans.VetoableChangeListener
+import java.awt.event.MouseListener
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.JComponent
-import javax.swing.JList
+import javax.swing.JScrollBar
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
-import kotlin.concurrent.timer
 
 
 class TextChat : JScrollPane(), oChat {
     private var loadHistory:Boolean=false
     var oChat:JTextPane=JTextPane()
     var clientApi:Client?=null
+    var autoBottom:Boolean=true
     init {
         oChat.layout = BorderLayout()
         setViewportView(oChat)
         oChat.isEditable=false
+        val bar: JScrollBar = getVerticalScrollBar() // 返回控制视口垂直视图位置的垂直滚动条
+        bar.addAdjustmentListener{
+            autoBottom = isBottom()
+        }
     }
     private var lines = 0
     @Synchronized
     private fun gotoConsoleLow() {
-        if (verticalScrollBar.maximum-height-verticalScrollBar.value<100){
+        if (autoBottom){
             oChat.caretPosition = oChat.document.length
         }
+    }
+    private fun isBottom():Boolean{
+        if (verticalScrollBar.maximum-height-verticalScrollBar.value<100){
+            return true
+        }
+        return false
     }
     override fun addMsgToOChat(msg: Msg) {
         when (msg.type) {
             "msg" -> {
                 if (msg.content.indexOf("\"msgType\":\"redPacket\"") > 0) {
-                    //红包消息
-                    val red =
-                        Gson().fromJson(msg.content, RedPack::class.java)
-                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName,msg.time)
+
+                    PropertiesComponent.getInstance().getBoolean("pwl_openMsg").let {
+                        if (!it){
+                            //红包消息
+                            val red =
+                                Gson().fromJson(msg.content, RedPack::class.java)
+                            addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName,msg.time)
+                        }
+                    }
                 } else {
                     val doc: Document = Jsoup.parse(msg.content)
                     var m = doc.text()
@@ -106,7 +120,7 @@ class TextChat : JScrollPane(), oChat {
 
     private fun linesADD() {
         lines++
-        if (lines > 200) {
+        if (lines > 600) {
             val split = oChat.text?.split("\n")
             val newText = split?.slice(split.size.minus(100)..split.size.minus(1))
             oChat.text = newText?.joinToString(separator = "\n")

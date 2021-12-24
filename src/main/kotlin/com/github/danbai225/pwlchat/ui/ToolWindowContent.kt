@@ -4,6 +4,7 @@ import com.github.danbai225.pwlchat.client.Client
 import com.github.danbai225.pwlchat.component.TextChat
 import com.github.danbai225.pwlchat.component.WebChat
 import com.github.danbai225.pwlchat.component.oChat
+import com.github.danbai225.pwlchat.draw.testDraw
 import com.github.danbai225.pwlchat.notify.sendNotify
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
@@ -78,16 +79,20 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 oChat?.addInfoToOChat(
                     "help",
                     "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n#revoke - 撤回最后一条发送的消息\n#exit - 退出登陆\n#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)\n" +
-                            "#web - 切换输出模式 参数1(开启) 0 or 1\n#clear - 清空聊天记录"
+                            "#web - 切换输出模式 参数1(开启) 0 or 1\n#clear - 清空聊天记录\n#openmsg 是否显示抢红包信息 参数1(开启) 0 or 1\n"
                 )
                 return
             }
             "#packet", "#红包" -> {
-                if (split.size<4||split[1].isEmpty()||split[2].isEmpty()){
+                if (split.size<3||split[1].isEmpty()||split[2].isEmpty()){
                     oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
                     return
                 }
-                client?.packet(split[1].toInt(), split[2].toInt(), split[3])
+                var msg="摸鱼红包"
+                if(split.size>3){
+                    msg=split[3]
+                }
+                client?.packet(split[1].toInt(), split[2].toInt(), msg)
                 return
             }
             "#revoke", "#撤回" -> {
@@ -131,8 +136,17 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 }
                 return
             }
+            "#openmsg"-> {
+                if (split.size<2||split[1].isEmpty()){
+                    oChat?.addInfoToOChat("#openmsg","参数有误请输入#help查看帮助")
+                    return
+                }
+                PropertiesComponent.getInstance().setValue("pwl_openMsg", split[1].toInt() == 0)
+                return
+            }
             "#clear","#清空"-> {
                 oChat?.clear()
+                return
             }
         }
         msg?.let { client?.sendMsg(it) }
@@ -164,8 +178,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
             send?.text = "send"
         }
         //其他
-//        var jbCefBrowser = JBCefBrowser("https://pwl.icu")
-//        draw?.add(jbCefBrowser.component)
+        draw?.add(testDraw())
     }
 
     private fun even() {
