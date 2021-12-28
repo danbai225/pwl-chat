@@ -1,5 +1,6 @@
 package com.github.danbai225.pwlchat.client
 
+import com.github.danbai225.pwlchat.component.TextChat
 import com.github.danbai225.pwlchat.component.oChat
 import com.github.danbai225.pwlchat.pj.*
 import com.github.danbai225.pwlchat.utils.StringUtils

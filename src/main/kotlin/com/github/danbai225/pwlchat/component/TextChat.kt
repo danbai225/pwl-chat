@@ -21,59 +21,63 @@ import javax.swing.JTextPane
 
 
 class TextChat : JScrollPane(), oChat {
-    private var loadHistory:Boolean=false
-    var oChat:JTextPane=JTextPane()
-    var clientApi:Client?=null
-    var autoBottom:Boolean=true
+    private var loadHistory: Boolean = false
+    var oChat: JTextPane = JTextPane()
+    var clientApi: Client? = null
+    var autoBottom: Boolean = true
+
     init {
         oChat.layout = BorderLayout()
         setViewportView(oChat)
-        oChat.isEditable=false
+        oChat.isEditable = false
         val bar: JScrollBar = getVerticalScrollBar() // 返回控制视口垂直视图位置的垂直滚动条
-        bar.addAdjustmentListener{
+        bar.addAdjustmentListener {
             autoBottom = isBottom()
         }
     }
+
     private var lines = 0
+
     @Synchronized
     private fun gotoConsoleLow() {
-        if (autoBottom){
+        if (autoBottom) {
             oChat.caretPosition = oChat.document.length
         }
     }
-    private fun isBottom():Boolean{
-        if (verticalScrollBar.maximum-height-verticalScrollBar.value<100){
+
+    private fun isBottom(): Boolean {
+        if (verticalScrollBar.maximum - height - verticalScrollBar.value < 100) {
             return true
         }
         return false
     }
+
     override fun addMsgToOChat(msg: Msg) {
         when (msg.type) {
             "msg" -> {
                 if (msg.content.indexOf("\"msgType\":\"redPacket\"") > 0) {
-
-                    PropertiesComponent.getInstance().getBoolean("pwl_openMsg").let {
-                        if (!it){
-                            //红包消息
-                            val red =
-                                Gson().fromJson(msg.content, RedPack::class.java)
-                            addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName,msg.time)
-                        }
-                    }
+                    //红包消息
+                    val red =
+                        Gson().fromJson(msg.content, RedPack::class.java)
+                    addMsgToOChat(red.msg + "(🧧红包消息)", msg.userName, msg.time)
                 } else {
                     val doc: Document = Jsoup.parse(msg.content)
                     var m = doc.text()
                     if (m.isEmpty()) {
                         m = "(表情.jpg)"
                     }
-                    addMsgToOChat(m, msg.userName,msg.time)
+                    addMsgToOChat(m, msg.userName, msg.time)
                 }
                 linesADD()
             }
             //抢红包消息
             "redPacketStatus" -> {
-                addInfoToOChat("openPacket", "${msg.whoGot}抢到了${msg.whoGive}的红包")
-                linesADD()
+                PropertiesComponent.getInstance().getBoolean("pwl_openMsg").let {
+                    if (!it) {
+                        addInfoToOChat("openPacket", "${msg.whoGot}抢到了${msg.whoGive}的红包")
+                        linesADD()
+                    }
+                }
             }
         }
     }
@@ -93,27 +97,28 @@ class TextChat : JScrollPane(), oChat {
     override fun getComponent(): JComponent {
         return this
     }
+
     override fun setClient(client: Client) {
-        clientApi=client
+        clientApi = client
         clientApi?.more(1)
     }
 
-    override fun loadHistory(boolean: Boolean):Boolean {
-        if (boolean){
-            loadHistory=true
+    override fun loadHistory(boolean: Boolean): Boolean {
+        if (boolean) {
+            loadHistory = true
         }
         return loadHistory
     }
 
     override fun clear() {
-        oChat.text=""
+        oChat.text = ""
     }
 
     override fun close() {
         isEnabled = true
     }
 
-    private fun addMsgToOChat(msg: String?, UserName: String?,time:String) {
+    private fun addMsgToOChat(msg: String?, UserName: String?, time: String) {
         oChat.text += "[$time] $UserName: $msg\n"
         gotoConsoleLow()
     }
@@ -127,7 +132,8 @@ class TextChat : JScrollPane(), oChat {
             lines = newText?.size!!
         }
     }
-    companion object{
+
+    companion object {
         private val logger: Logger = LoggerFactory.getLogger(TextChat::class.java)
     }
 }
