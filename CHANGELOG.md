@@ -4,6 +4,5 @@
 
 ## [Unreleased]
 
-## [0.1.1]
-- FixBug
-- openMsg switch
+## [0.1.3]
+- Modify url

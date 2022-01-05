@@ -56,7 +56,7 @@ class WebChat : JBCefBrowser(), oChat {
                             "response => console.log('调用成功', response)",
                             "(error_code, error_message) => console.log('调用失败', error_code, error_message)"
                         )}};",
-                        "https://pwl.icu/js/openRedPacket.js", 0
+                        "https://fishpi.cn/js/openRedPacket.js", 0
                     )
                 }
             }
@@ -67,7 +67,7 @@ class WebChat : JBCefBrowser(), oChat {
         val html2 = Base64.getEncoder().encodeToString(html.toByteArray())
         cefBrowser.executeJavaScript(
             """$("#chat").append(decodeURIComponent(escape(window.atob('$html2')))); if ((${'$'}("#chat").height()-document.body.clientHeight-${'$'}(this).scrollTop())<333){window.scrollTo(0, ${'$'}("#chat").height())};""",
-            "https://pwl.icu/js/main.js",
+            "https://fishpi.cn/js/main.js",
             0
         )
     }
