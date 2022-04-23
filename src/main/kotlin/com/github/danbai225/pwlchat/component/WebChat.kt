@@ -9,13 +9,13 @@ import com.github.danbai225.pwlchat.pj.RedPack
 import com.google.gson.Gson
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.ui.jcef.JBCefBrowser
+import com.intellij.ui.jcef.JBCefBrowserBase
 import com.intellij.ui.jcef.JBCefJSQuery
 import org.cef.browser.CefBrowser
 import org.cef.browser.CefFrame
 import org.cef.handler.CefLoadHandlerAdapter
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -38,7 +38,8 @@ class WebChat : JBCefBrowser(), oChat {
     //添加js回调
     private fun callBackJs(){
         //打开红包
-        val openRedPacket=JBCefJSQuery.create(this)
+
+        val openRedPacket=JBCefJSQuery.create(this as JBCefBrowserBase)
 
         openRedPacket.addHandler { args: String ->
             clientApi?.openPacket(args)
@@ -48,7 +49,7 @@ class WebChat : JBCefBrowser(), oChat {
             override fun onLoadEnd(browser: CefBrowser, frame: CefFrame, httpStatusCode: Int) {
                 //onLoadEnd 在加载iframe也会触发
                 //初次加载
-                if(browser.url=="about:blank"){
+                if(browser.url.contains("about:blank")){
                     clientApi?.more(1)
                     browser.executeJavaScript(
                         "window.openRedPacket = function(arg) {${openRedPacket.inject(

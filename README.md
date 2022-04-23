@@ -64,11 +64,16 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 ## 已知BUG
 
+- 滑动问题。
+
 ## TODO
 
 - 引用等更多操作
 - web页撤回
-- draw接口
+
+## 版本兼容问题
+
+主要兼容2020.3以后的版本
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
