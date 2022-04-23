@@ -330,14 +330,14 @@ class Client {
      */
     //teyxBFF7JjkXHv
     companion object {
-        const val PWL_WSS = "wss://pwl.icu/chat-room-channel"
-        private const val PWL_LOGIN = "https://pwl.icu/login"
-        private const val PWL_LIVE = "https://pwl.icu/user/liveness"
-        private const val PWL_SEND = "https://pwl.icu/chat-room/send"
-        private const val PWL_OPEN = "https://pwl.icu/chat-room/red-packet/open"
-        private const val PWL_REVOKE = "https://pwl.icu/chat-room/revoke/"
-        private const val PWL_UPLOAD = "https://pwl.icu/upload"
-        private const val PWL_MORE="https://pwl.icu/chat-room/more"
+        const val PWL_WSS = "wss://fishpi.cn/chat-room-channel"
+        private const val PWL_LOGIN = "https://fishpi.cn/login"
+        private const val PWL_LIVE = "https://fishpi.cn/user/liveness"
+        private const val PWL_SEND = "https://fishpi.cn/chat-room/send"
+        private const val PWL_OPEN = "https://fishpi.cn/chat-room/red-packet/open"
+        private const val PWL_REVOKE = "https://fishpi.cn/chat-room/revoke/"
+        private const val PWL_UPLOAD = "https://fishpi.cn/upload"
+        private const val PWL_MORE="https://fishpi.cn/chat-room/more"
         private val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
         private val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }

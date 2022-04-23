@@ -33,7 +33,7 @@ class PwlCefResourceRequestHandler : CefRequestHandlerAdapter(), CefResourceRequ
     override fun onBeforeResourceLoad(p0: CefBrowser?, p1: CefFrame?, p2: CefRequest?): Boolean {
         val headerMap: HashMap<String, String> = HashMap()
         p2?.getHeaderMap(headerMap)
-        headerMap["referer"] = "https://pwl.icu/"
+        headerMap["referer"] = "https://fishpi.cn/"
         p2?.setHeaderMap(headerMap)
         return false
     }
