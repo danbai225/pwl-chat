@@ -73,7 +73,8 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 ## 版本兼容问题
 
-主要兼容2020.3以后的版本
+主要兼容2020.3以后的版本 v0.1.3
+2021.1以后的版本 v0.1.4
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
