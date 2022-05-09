@@ -4,6 +4,7 @@
 
 ## [Unreleased]
 
-## [0.1.4]
-- compatibilityModification
-- 兼容性修改
+## [0.1.5]
+- TwoStepVerification
+- 二步验证
+- 滑动条修复
