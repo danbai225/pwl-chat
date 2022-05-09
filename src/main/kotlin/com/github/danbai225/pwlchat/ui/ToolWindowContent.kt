@@ -8,6 +8,7 @@ import com.github.danbai225.pwlchat.draw.testDraw
 import com.github.danbai225.pwlchat.notify.sendNotify
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.editor.event.DocumentListener
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.util.ui.ImageUtil
@@ -24,6 +25,7 @@ import java.awt.event.MouseEvent
 import java.io.*
 import javax.imageio.ImageIO
 import javax.swing.*
+import javax.swing.event.DocumentEvent
 
 
 class ToolWindowContent(p: Project?) : JPanel() {
@@ -59,6 +61,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
         if (!client?.isLogin!!) {
             client?.userName = Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
             client?.password = Messages.showPasswordDialog("Password", "鱼油登录")
+            client?.mfaCode = Messages.showPasswordDialog("二步验证码（无可忽略）", "鱼油登录")
             if (client?.login() == true) {
                 send?.text = "send"
             } else {

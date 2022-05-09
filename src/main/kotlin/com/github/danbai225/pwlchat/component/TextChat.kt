@@ -30,26 +30,15 @@ class TextChat : JScrollPane(), oChat {
         oChat.layout = BorderLayout()
         setViewportView(oChat)
         oChat.isEditable = false
-        val bar: JScrollBar = getVerticalScrollBar() // 返回控制视口垂直视图位置的垂直滚动条
-        bar.addAdjustmentListener {
-            autoBottom = isBottom()
-        }
     }
 
     private var lines = 0
 
     @Synchronized
     private fun gotoConsoleLow() {
-        if (autoBottom) {
+        if (!getVerticalScrollBar().valueIsAdjusting) {
             oChat.caretPosition = oChat.document.length
         }
-    }
-
-    private fun isBottom(): Boolean {
-        if (verticalScrollBar.maximum - height - verticalScrollBar.value < 100) {
-            return true
-        }
-        return false
     }
 
     override fun addMsgToOChat(msg: Msg) {

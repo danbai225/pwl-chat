@@ -29,6 +29,7 @@ class Client {
     private val client = OkHttpClient()
     var userName: String? = ""
     var password: String? = ""
+    var mfaCode:String?=""
     var isLogin: Boolean = false
     var eventLog: Boolean = false
     private var onlineVitality = 0.0
@@ -210,7 +211,7 @@ class Client {
         val md5p = password?.let { StringUtils.md5(it) }
         val call = post(
             PWL_LOGIN,
-            "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"captcha\":\"\"}"
+            "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"mfaCode\":\"$mfaCode\"}"
         )
         call?.execute().use { response ->
             val msg = Gson().fromJson(response?.body()?.string(), loginInfo::class.java)
