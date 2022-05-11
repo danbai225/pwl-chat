@@ -8,10 +8,14 @@ import com.github.danbai225.pwlchat.draw.testDraw
 import com.github.danbai225.pwlchat.notify.sendNotify
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.editor.event.DocumentListener
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.util.ui.ImageUtil
+import com.intellij.util.ui.addPropertyChangeListener
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
@@ -23,9 +27,12 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.*
+import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.*
 import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import kotlin.collections.ArrayDeque
 
 
 class ToolWindowContent(p: Project?) : JPanel() {
@@ -77,7 +84,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
         iChat?.text = ""
         val split = msg?.split(" ")
         //命令解析
-        when (split?.get(0)?.toLowerCase()) {
+        when (split?.get(0)?.lowercase(Locale.getDefault())) {
             "#help", "#帮助" -> {
                 oChat?.addInfoToOChat(
                     "help",
@@ -195,8 +202,10 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 when (e.keyCode) {
                     //回车 发送
                     KeyEvent.VK_ENTER -> {
-                        e.consume()
-                        sendMsg()
+                        if (!e.isShiftDown){
+                            e.consume()
+                            sendMsg()
+                        }
                     }
                     //方向键上 向上翻滚发送记录
                     KeyEvent.VK_DOWN -> {
@@ -249,6 +258,16 @@ class ToolWindowContent(p: Project?) : JPanel() {
                         iChat?.text += "![image.png]($url)"
                     }
                 }
+                //换行
+                if (e.isShiftDown && e.keyCode == KeyEvent.VK_ENTER) {
+                    iChat?.text += "\n"
+                }
+                //@
+//                if (e.isShiftDown && e.keyCode == KeyEvent.VK_2) {
+//                    JBPopupFactory.getInstance()
+//                        .createListPopup(BaseListPopupStep<Any?>("标题", "第一个值", "第二个值", "可以有任意个值..."))
+//                        .showInFocusCenter()
+//                }
             }
         })
         //聊天列表双击@
@@ -263,6 +282,19 @@ class ToolWindowContent(p: Project?) : JPanel() {
                         iChat?.requestFocusInWindow()
                     }
                 }
+            }
+        })
+        iChat?.document?.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent?) {
+
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+
+            }
+
+            override fun changedUpdate(e: DocumentEvent?) {
+
             }
         })
     }

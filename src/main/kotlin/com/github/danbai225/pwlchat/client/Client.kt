@@ -9,6 +9,7 @@ import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.project.Project
 import com.jetbrains.rd.util.use
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import okhttp3.*
@@ -152,6 +153,7 @@ class Client {
     }
 
     //发送消息
+    @OptIn(DelicateCoroutinesApi::class)
     fun sendMsg(msg: String) {
         if (msg.isEmpty()) {
             return

@@ -64,12 +64,8 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 ## 已知BUG
 
-- 滑动问题。
 
 ## TODO
-
-- 引用等更多操作
-- web页撤回
 
 ## 版本兼容问题
 
