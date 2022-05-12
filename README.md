@@ -5,7 +5,7 @@
 [![Downloads](https://img.shields.io/jetbrains/plugin/d/com.github.danbai225.pwlchat.svg)](https://plugins.jetbrains.com/plugin/com.github.danbai225.pwlchat)
 
 ## Template ToDo list
-
+![image-56c2aad9](https://danbai.oss-accelerate.aliyuncs.com/bk/image-56c2aad9.png)
 <!-- Plugin description -->
 
 This is a connection [pwl](https://pwl.icu) chat plugin.
