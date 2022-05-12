@@ -8,30 +8,26 @@ import com.github.danbai225.pwlchat.draw.testDraw
 import com.github.danbai225.pwlchat.notify.sendNotify
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.openapi.ui.popup.JBPopupListener
+import com.intellij.openapi.ui.popup.LightweightWindowEvent
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
+import com.intellij.ui.popup.list.ListPopupImpl
 import com.intellij.util.ui.ImageUtil
-import com.intellij.util.ui.addPropertyChangeListener
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.datatransfer.DataFlavor
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.io.*
+import java.awt.event.*
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.*
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import kotlin.collections.ArrayDeque
 
 
@@ -223,6 +219,36 @@ class ToolWindowContent(p: Project?) : JPanel() {
                             history.removeLast()
                         }
                     }
+                    KeyEvent.VK_TAB->{
+                        // tab 模糊提示
+                        iChat?.let { it ->
+                            var substring = it.text.substring(0, it.caretPosition)
+                            val lastIndexAt = substring.lastIndexOf("@")
+                            val lastIndexSp = substring.lastIndexOf("#")
+                            if (lastIndexAt==0&&lastIndexSp==0){
+                               return
+                            }
+                            e.consume()
+                            if (lastIndexAt>lastIndexSp){
+                                val n = substring.substring(lastIndexAt+1)
+                                //@ 难写死了 找api
+                                val names = client?.names(n)
+                                val listPopup = JBPopupFactory.getInstance()
+                                    .createListPopup(BaseListPopupStep<Any?>("用户名模糊搜索", names)) as (ListPopupImpl)
+                                listPopup.addListener(object :JBPopupListener{
+                                    override fun onClosed(event: LightweightWindowEvent) {
+                                        if (event.isOk){
+                                            it.text=it.text.replaceFirst("@$n", "@"+listPopup.list.selectedValue as String, false)
+                                        }
+                                    }
+                                })
+                                listPopup.showInFocusCenter()
+                            }else{
+                                //#
+                                val n = substring.substring(lastIndexSp+1)
+                            }
+                        }
+                    }
                 }
             }
 
@@ -262,12 +288,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 if (e.isShiftDown && e.keyCode == KeyEvent.VK_ENTER) {
                     iChat?.text += "\n"
                 }
-                //@
-//                if (e.isShiftDown && e.keyCode == KeyEvent.VK_2) {
-//                    JBPopupFactory.getInstance()
-//                        .createListPopup(BaseListPopupStep<Any?>("标题", "第一个值", "第二个值", "可以有任意个值..."))
-//                        .showInFocusCenter()
-//                }
             }
         })
         //聊天列表双击@
@@ -284,19 +304,19 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 }
             }
         })
-        iChat?.document?.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) {
-
-            }
-
-            override fun removeUpdate(e: DocumentEvent?) {
-
-            }
-
-            override fun changedUpdate(e: DocumentEvent?) {
-
-            }
-        })
+//        iChat?.document?.addDocumentListener(object : DocumentListener {
+//            override fun insertUpdate(e: DocumentEvent?) {
+//
+//            }
+//
+//            override fun removeUpdate(e: DocumentEvent?) {
+//
+//            }
+//
+//            override fun changedUpdate(e: DocumentEvent?) {
+//
+//            }
+//        })
     }
 
     companion object {

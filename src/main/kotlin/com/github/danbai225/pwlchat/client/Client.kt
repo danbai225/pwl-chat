@@ -136,6 +136,7 @@ class Client {
                     onlineVitality = msg.liveness
                     hot?.value= onlineVitality.toInt()
                     isLogin = true
+                    yesterdayReward()
                     return true
                 }
             }
@@ -207,7 +208,21 @@ class Client {
             }
         }
     }
-
+    //用户名联想
+    fun names(n: String):List<String> {
+        var arrayList = ArrayList<String>()
+        post(PWL_NAMES,"{\"name\": \"$n\"}")?.execute().use {
+            val msg = Gson().fromJson(it?.body()?.string(), Names::class.java)
+            if (msg.code != 0) {
+                msg.msg.let { it1 -> oChat?.addErrToOChat("names", it1) }
+            }
+            msg.data?.forEach { item->arrayList.add(item.userName) }
+        }
+        return arrayList
+    }
+    fun yesterdayReward(){
+        get(PWL_YESTERDAY)?.execute()
+    }
     //登陆
     fun login(): Boolean {
         val md5p = password?.let { StringUtils.md5(it) }
@@ -341,6 +356,8 @@ class Client {
         private const val PWL_REVOKE = "https://fishpi.cn/chat-room/revoke/"
         private const val PWL_UPLOAD = "https://fishpi.cn/upload"
         private const val PWL_MORE="https://fishpi.cn/chat-room/more"
+        private const val PWL_NAMES="https://fishpi.cn/users/names"
+        private const val PWL_YESTERDAY="https://fishpi.cn/yesterday-liveness-reward-api"
         private val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
         private val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }
