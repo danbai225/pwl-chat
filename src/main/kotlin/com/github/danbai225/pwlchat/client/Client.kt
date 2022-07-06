@@ -41,13 +41,14 @@ class Client {
     var userLabel: JLabel? = null
     var hot : JProgressBar?=null
     var oChat: oChat? = null
+    var black:Boolean=false
     private var ws: ws? = null
 
     init {
         load()
         connect()
         timer("定时Thread_name", false, 2000, 1000) {
-            if (ws?.isClosed == true) {
+            if (ws?.isClosed == true&&!black) {
                 oChat?.addInfoToOChat("ws", "连接已断开")
                 connect()
                 if (ws?.isClosed == false) {
@@ -277,7 +278,13 @@ class Client {
     }
     fun more(page:Int){
         get(PWL_MORE+"?page=$page&_=${System.currentTimeMillis()}")?.execute().use {
-            val msg = Gson().fromJson(it?.body()?.string(), More::class.java)
+            val string = it?.body()?.string()
+            if (string?.contains("拉黑")==true){
+                oChat?.addErrToOChat("接口错误", string)
+                black=true
+                return
+            }
+            val msg = Gson().fromJson(string, More::class.java)
             val a=msg.data?.sortedBy { m->m.time }
             a?.forEach { m->
                 m.type="msg"
