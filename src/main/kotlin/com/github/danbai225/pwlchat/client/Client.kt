@@ -279,16 +279,17 @@ class Client {
     fun more(page:Int){
         get(PWL_MORE+"?page=$page&_=${System.currentTimeMillis()}")?.execute().use {
             val string = it?.body()?.string()
-            if (string?.contains("拉黑")==true){
-                oChat?.addErrToOChat("接口错误", string)
+            try {
+                val msg = Gson().fromJson(string, More::class.java)
+                val a=msg.data?.sortedBy { m->m.time }
+                a?.forEach { m->
+                    m.type="msg"
+                    onMessage(Gson().toJson(m))
+                }
+            }catch (e: Exception){
+                string?.let { it1 -> oChat?.addErrToOChat("接口错误", it1) }
                 black=true
                 return
-            }
-            val msg = Gson().fromJson(string, More::class.java)
-            val a=msg.data?.sortedBy { m->m.time }
-            a?.forEach { m->
-                m.type="msg"
-                onMessage(Gson().toJson(m))
             }
         }
     }
