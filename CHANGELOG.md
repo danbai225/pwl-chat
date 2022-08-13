@@ -4,5 +4,5 @@
 
 ## [Unreleased]
 
-## [0.1.6]
-- ip ban tip
+## [0.1.7]
+- fix wss

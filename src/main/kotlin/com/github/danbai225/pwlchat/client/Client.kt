@@ -25,6 +25,7 @@ class Client {
     /**
      * 基础属性和方法
      */
+    private var apiKey:String=""
     private var cookie: String = ""
     private var online: Int? = 0
     private val client = OkHttpClient()
@@ -42,17 +43,19 @@ class Client {
     var hot : JProgressBar?=null
     var oChat: oChat? = null
     var black:Boolean=false
-    private var ws: ws? = null
+    private var ws: Ws? = null
 
     init {
         load()
         connect()
         timer("定时Thread_name", false, 2000, 1000) {
-            if (ws?.isClosed == true&&!black) {
-                oChat?.addInfoToOChat("ws", "连接已断开")
-                connect()
-                if (ws?.isClosed == false) {
-                    oChat?.addInfoToOChat("ws", "连接已恢复")
+            if (isLogin){
+                if (ws?.isClosed == true&&!black) {
+                    oChat?.addInfoToOChat("ws", "连接已断开")
+                    //connect()
+                    if (ws?.isClosed == false) {
+                        oChat?.addInfoToOChat("ws", "连接已恢复")
+                    }
                 }
             }
         }
@@ -234,10 +237,26 @@ class Client {
         call?.execute().use { response ->
             val msg = Gson().fromJson(response?.body()?.string(), loginInfo::class.java)
             if (msg.code == 0) {
-                isLogin = true
                 cookie = "sym-ce=${msg.token}; "
                 save()
                 if (verifyLogin()) {
+                    connect()
+                    val call2 = post(
+                        PWL_API_Key,
+                        "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"mfaCode\":\"$mfaCode\"}"
+                    )
+                    call2?.execute().use { response2 ->
+                        val msg2 = Gson().fromJson(response2?.body()?.string(), loginInfo::class.java)
+                        if (msg.code == 0) {
+                            isLogin = true
+                            apiKey = msg2.Key
+                            save()
+                            if (verifyLogin()) {
+                                connect()
+                                return true
+                            }
+                        }
+                    }
                     return true
                 }
             }
@@ -293,13 +312,16 @@ class Client {
             }
         }
     }
+
     /**
      * WebSocket实现区
      */
     private fun connect() {
-        ws = ws()
-        ws?.client = this
-        ws?.connect()
+        if (isLogin){
+            ws = Ws(this,apiKey)
+            ws?.addHeader("Cookie",cookie)
+            ws?.connect()
+        }
     }
 
     fun onMessage(message: String) {
@@ -366,6 +388,7 @@ class Client {
         private const val PWL_MORE="https://fishpi.cn/chat-room/more"
         private const val PWL_NAMES="https://fishpi.cn/users/names"
         private const val PWL_YESTERDAY="https://fishpi.cn/yesterday-liveness-reward-api"
+        private const val PWL_API_Key="https://fishpi.cn/api/getKey"
         private val JSON: MediaType? = MediaType.parse("application/json; charset=utf-8")
         private val logger: Logger = LoggerFactory.getLogger(Client::class.java)
     }

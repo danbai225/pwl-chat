@@ -61,17 +61,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
     }
 
     fun sendMsg() {
-        if (!client?.isLogin!!) {
-            client?.userName = Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
-            client?.password = Messages.showPasswordDialog("Password", "鱼油登录")
-            client?.mfaCode = Messages.showPasswordDialog("二步验证码（无可忽略）", "鱼油登录")
-            if (client?.login() == true) {
-                send?.text = "send"
-            } else {
-                Messages.showMessageDialog(":(验证未通过", "MSG", Messages.getInformationIcon())
-                return
-            }
-        }
+        loginD()
         val msg = iChat?.text
         if (history.size >= 20) {
             history.removeFirst()
@@ -158,6 +148,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
         msg?.let { client?.sendMsg(it) }
     }
     private fun component() {
+
         //自身属性
         layout = BorderLayout()
         add(root, BorderLayout.CENTER)
@@ -185,6 +176,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
         }
         //其他
         draw?.add(testDraw())
+        loginD()
     }
 
     private fun even() {
@@ -319,6 +311,19 @@ class ToolWindowContent(p: Project?) : JPanel() {
 //        })
     }
 
+    private fun loginD(){
+        if (!client?.isLogin!!) {
+            client?.userName = Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
+            client?.password = Messages.showPasswordDialog("Password", "鱼油登录")
+            client?.mfaCode = Messages.showPasswordDialog("二步验证码（无可忽略）", "鱼油登录")
+            if (client?.login() == true) {
+                send?.text = "send"
+            } else {
+                Messages.showMessageDialog(":(验证未通过", "MSG", Messages.getInformationIcon())
+                return
+            }
+        }
+    }
     companion object {
         val logger: Logger = LoggerFactory.getLogger(ToolWindowContent::class.java)
     }
