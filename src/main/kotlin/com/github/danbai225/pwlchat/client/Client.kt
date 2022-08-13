@@ -52,7 +52,7 @@ class Client {
             if (isLogin){
                 if (ws?.isClosed == true&&!black) {
                     oChat?.addInfoToOChat("ws", "连接已断开")
-                    //connect()
+                    connect()
                     if (ws?.isClosed == false) {
                         oChat?.addInfoToOChat("ws", "连接已恢复")
                     }
@@ -81,6 +81,11 @@ class Client {
         PropertiesComponent.getInstance().getBoolean("pwl_eventLog").let {
             eventLog = it
         }
+        PropertiesComponent.getInstance().getValue("pwl_apiKey").let {
+            if (it != null) {
+                apiKey = it
+            }
+        }
     }
 
     //数据持久化
@@ -89,6 +94,7 @@ class Client {
         PropertiesComponent.getInstance().setValue("pwl_userName", userName)
         PropertiesComponent.getInstance().setValue("pwl_password", password)
         PropertiesComponent.getInstance().setValue("pwl_eventLog", eventLog)
+        PropertiesComponent.getInstance().setValue("pwl_apiKey", apiKey)
     }
 
     fun setOChatApi(o: oChat) {
@@ -136,15 +142,26 @@ class Client {
             val get = get(PWL_LIVE)
             get?.execute().use { response ->
                 if (response?.code() == 200) {
-                    val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
-                    onlineVitality = msg.liveness
-                    hot?.value= onlineVitality.toInt()
-                    isLogin = true
-                    yesterdayReward()
-                    return true
+                    val request: Request = Request.Builder()
+                        .url("$PWL_LIVE?apiKey=$apiKey")
+                        .get()
+                        .build()
+                    client.newCall(request).execute().use {
+                        if (it.code() == 200){
+                            val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
+                            onlineVitality = msg.liveness
+                            hot?.value= onlineVitality.toInt()
+                            isLogin = true
+                            yesterdayReward()
+                            return true
+                        }
+                    }
+                    isLogin = false
+                    return false
                 }
             }
         }
+        isLogin = false
         return false
     }
 
@@ -239,26 +256,24 @@ class Client {
             if (msg.code == 0) {
                 cookie = "sym-ce=${msg.token}; "
                 save()
-                if (verifyLogin()) {
-                    connect()
-                    val call2 = post(
-                        PWL_API_Key,
-                        "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"mfaCode\":\"$mfaCode\"}"
-                    )
-                    call2?.execute().use { response2 ->
-                        val msg2 = Gson().fromJson(response2?.body()?.string(), loginInfo::class.java)
-                        if (msg.code == 0) {
-                            isLogin = true
-                            apiKey = msg2.Key
-                            save()
-                            if (verifyLogin()) {
-                                connect()
-                                return true
-                            }
+                connect()
+                val call2 = post(
+                    PWL_API_Key,
+                    "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"mfaCode\":\"$mfaCode\"}"
+                )
+                call2?.execute().use { response2 ->
+                    val msg2 = Gson().fromJson(response2?.body()?.string(), loginInfo::class.java)
+                    if (msg.code == 0) {
+                        isLogin = true
+                        apiKey = msg2.Key
+                        save()
+                        if (verifyLogin()) {
+                            connect()
+                            return true
                         }
                     }
-                    return true
                 }
+                return true
             }
         }
         return false
