@@ -1,6 +1,5 @@
 package com.github.danbai225.pwlchat.client
 
-import com.github.danbai225.pwlchat.component.TextChat
 import com.github.danbai225.pwlchat.component.oChat
 import com.github.danbai225.pwlchat.pj.*
 import com.github.danbai225.pwlchat.utils.StringUtils
@@ -26,7 +25,6 @@ class Client {
      * 基础属性和方法
      */
     private var apiKey:String=""
-    private var cookie: String = ""
     private var online: Int? = 0
     private val client = OkHttpClient()
     var userName: String? = ""
@@ -47,7 +45,10 @@ class Client {
 
     init {
         load()
-        connect()
+        verifyLogin()
+        if (isLogin){
+            connect()
+        }
         timer("定时Thread_name", false, 2000, 1000) {
             if (isLogin){
                 if (ws?.isClosed == true&&!black) {
@@ -63,11 +64,6 @@ class Client {
 
     //加载持久数据
     private fun load() {
-        PropertiesComponent.getInstance().getValue("pwl_cookie").let {
-            if (it != null) {
-                cookie = it
-            }
-        }
         PropertiesComponent.getInstance().getValue("pwl_userName").let {
             if (it != null) {
                 userName = it
@@ -90,7 +86,6 @@ class Client {
 
     //数据持久化
     fun save() {
-        PropertiesComponent.getInstance().setValue("pwl_cookie", cookie)
         PropertiesComponent.getInstance().setValue("pwl_userName", userName)
         PropertiesComponent.getInstance().setValue("pwl_password", password)
         PropertiesComponent.getInstance().setValue("pwl_eventLog", eventLog)
@@ -108,8 +103,7 @@ class Client {
     private fun post(url: String, json: String): Call? {
         val requestBody: RequestBody = RequestBody.create(JSON, java.lang.String.valueOf(json))
         val request: Request = Request.Builder()
-            .url(url)
-            .addHeader("Cookie", cookie)
+            .url(if (url.indexOf("?",0,false)>0) "$url&apiKey=$apiKey" else "$url?apiKey=$apiKey")
             .post(requestBody)
             .build()
         return client.newCall(request)
@@ -117,8 +111,7 @@ class Client {
 
     private fun delete(url: String): Call? {
         val request: Request = Request.Builder()
-            .url(url)
-            .addHeader("Cookie", cookie)
+            .url(if (url.indexOf("?",0,false)>0) "$url&apiKey=$apiKey" else "$url?apiKey=$apiKey")
             .delete()
             .build()
         return client.newCall(request)
@@ -126,8 +119,7 @@ class Client {
 
     private fun get(url: String): Call? {
         val request: Request = Request.Builder()
-            .url(url)
-            .addHeader("Cookie", cookie)
+            .url(if (url.indexOf("?",0,false)>0) "$url&apiKey=$apiKey" else "$url?apiKey=$apiKey")
             .get()
             .build()
         return client.newCall(request)
@@ -138,26 +130,16 @@ class Client {
      */
     //登陆有效性验证
     fun verifyLogin(): Boolean {
-        if (cookie != "") {
+        if (apiKey != "") {
             val get = get(PWL_LIVE)
             get?.execute().use { response ->
                 if (response?.code() == 200) {
-                    val request: Request = Request.Builder()
-                        .url("$PWL_LIVE?apiKey=$apiKey")
-                        .get()
-                        .build()
-                    client.newCall(request).execute().use {
-                        if (it.code() == 200){
-                            val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
-                            onlineVitality = msg.liveness
-                            hot?.value= onlineVitality.toInt()
-                            isLogin = true
-                            yesterdayReward()
-                            return true
-                        }
-                    }
-                    isLogin = false
-                    return false
+                    val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
+                    onlineVitality = msg.liveness
+                    hot?.value= onlineVitality.toInt()
+                    isLogin = true
+                    yesterdayReward()
+                    return true
                 }
             }
         }
@@ -205,7 +187,6 @@ class Client {
                     openPacket(it)
                 }
             }
-            verifyLogin()
         }
     }
 
@@ -231,7 +212,7 @@ class Client {
     }
     //用户名联想
     fun names(n: String):List<String> {
-        var arrayList = ArrayList<String>()
+        val arrayList = ArrayList<String>()
         post(PWL_NAMES,"{\"name\": \"$n\"}")?.execute().use {
             val msg = Gson().fromJson(it?.body()?.string(), Names::class.java)
             if (msg.code != 0) {
@@ -241,49 +222,37 @@ class Client {
         }
         return arrayList
     }
-    fun yesterdayReward(){
+    private fun yesterdayReward(){
         get(PWL_YESTERDAY)?.execute()
     }
     //登陆
     fun login(): Boolean {
         val md5p = password?.let { StringUtils.md5(it) }
         val call = post(
-            PWL_LOGIN,
+            PWL_API_Key,
             "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"mfaCode\":\"$mfaCode\"}"
         )
         call?.execute().use { response ->
             val msg = Gson().fromJson(response?.body()?.string(), loginInfo::class.java)
             if (msg.code == 0) {
-                cookie = "sym-ce=${msg.token}; "
-                save()
-                connect()
-                val call2 = post(
-                    PWL_API_Key,
-                    "{\"nameOrEmail\":\"$userName\",\"userPassword\":\"$md5p\",\"rememberLogin\":true,\"mfaCode\":\"$mfaCode\"}"
-                )
-                call2?.execute().use { response2 ->
-                    val msg2 = Gson().fromJson(response2?.body()?.string(), loginInfo::class.java)
-                    if (msg.code == 0) {
-                        isLogin = true
-                        apiKey = msg2.Key
-                        save()
-                        if (verifyLogin()) {
-                            connect()
-                            return true
-                        }
-                    }
+                apiKey = msg.Key
+                if (verifyLogin()) {
+                    isLogin = true
+                    save()
+                    connect()
+                    return true
                 }
-                return true
             }
-        }
+        }//teyxBFF7JjkXHv
         return false
     }
 
     fun exit() {
-        cookie = ""
+        apiKey = ""
         userName = ""
         password = ""
         isLogin = false
+        save()
     }
 
     fun upload(file: File): String? {
@@ -295,8 +264,7 @@ class Client {
             )
             .build()
         val request: Request = Request.Builder()
-            .url(PWL_UPLOAD)
-            .addHeader("Cookie", cookie)
+            .url("$PWL_UPLOAD?apiKey=$apiKey")
             .post(requestBody)
             .build()
         try {
@@ -334,7 +302,6 @@ class Client {
     private fun connect() {
         if (isLogin){
             ws = Ws(this,apiKey)
-            ws?.addHeader("Cookie",cookie)
             ws?.connect()
         }
     }
@@ -394,7 +361,6 @@ class Client {
     //teyxBFF7JjkXHv
     companion object {
         const val PWL_WSS = "wss://fishpi.cn/chat-room-channel"
-        private const val PWL_LOGIN = "https://fishpi.cn/login"
         private const val PWL_LIVE = "https://fishpi.cn/user/liveness"
         private const val PWL_SEND = "https://fishpi.cn/chat-room/send"
         private const val PWL_OPEN = "https://fishpi.cn/chat-room/red-packet/open"

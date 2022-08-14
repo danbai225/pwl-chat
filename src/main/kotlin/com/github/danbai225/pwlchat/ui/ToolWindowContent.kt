@@ -151,12 +151,12 @@ class ToolWindowContent(p: Project?) : JPanel() {
 
         //自身属性
         layout = BorderLayout()
-        add(root, BorderLayout.CENTER)
+        root?.let { add(it, BorderLayout.CENTER) }
         //聊天渲染
         PropertiesComponent.getInstance().getBoolean("pwl_web").let {
             WebView = it
         }
-        var chat: oChat = if (WebView) {
+        val chat: oChat = if (WebView) {
             WebChat()
         } else {
             TextChat()
@@ -171,12 +171,12 @@ class ToolWindowContent(p: Project?) : JPanel() {
         client?.userLabel = userLabel
         client?.userlist=userlist
         client?.hot=hot
-        if (client?.verifyLogin() == true) {
-            send?.text = "send"
-        }
         //其他
         draw?.add(testDraw())
         loginD()
+        if (client?.isLogin == true) {
+            send?.text = "send"
+        }
     }
 
     private fun even() {
@@ -312,7 +312,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
     }
 
     private fun loginD(){
-        if (!client?.isLogin!!) {
+        if (client?.isLogin==false) {
             client?.userName = Messages.showInputDialog("Username", "鱼油登录", Messages.getInformationIcon())
             client?.password = Messages.showPasswordDialog("Password", "鱼油登录")
             client?.mfaCode = Messages.showPasswordDialog("二步验证码（无可忽略）", "鱼油登录")
