@@ -179,7 +179,6 @@ class Client {
             } catch (e: Exception) {
                 e.message?.let { oChat?.addErrToOChat("sendMsg", it) }
             }
-
             if (pkList.size > 0) {
                 val selectedSeries = pkList.toMutableList()
                 pkList.clear()
@@ -313,12 +312,14 @@ class Client {
         when (msg.type) {
             "msg" -> {
                 if (msg.content.indexOf("\"msgType\":\"redPacket\"") > 0) {
-                    //红包消息记录oid
-                    msg.oId?.let {
-                        if (pkList.size > 100) {
-                            pkList.removeAt(0)
+                    if (PropertiesComponent.getInstance().getBoolean("auto_packet",true)){
+                        //红包消息记录oid
+                        msg.oId?.let {
+                            if (pkList.size > 100) {
+                                pkList.removeAt(0)
+                            }
+                            pkList.add(it)
                         }
-                        pkList.add(it)
                     }
                 } else {
                     if (msg.userName == userName) {

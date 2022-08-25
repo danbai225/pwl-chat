@@ -74,8 +74,16 @@ class ToolWindowContent(p: Project?) : JPanel() {
             "#help", "#帮助" -> {
                 oChat?.addInfoToOChat(
                     "help",
-                    "帮助命令：命令都是以#开头 参数用空格分割\n#help - 输出本帮助命令\n#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n#revoke - 撤回最后一条发送的消息\n#exit - 退出登陆\n#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)\n" +
-                            "#web - 切换输出模式 参数1(开启) 0 or 1\n#clear - 清空聊天记录\n#openmsg 是否显示抢红包信息 参数1(开启) 0 or 1\n"
+                    "帮助命令：命令都是以#开头 参数用空格分割\n" +
+                            "#help - 输出本帮助命令\n" +
+                            "#packet - 发送红包，参数1(个数) 参数2(总额) 参数3(消息)\n" +
+                            "#revoke - 撤回最后一条发送的消息\n" +
+                            "#exit - 退出登陆\n" +
+                            "#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)\n" +
+                            "#web - 切换输出模式 参数1(开启) 0 or 1\n" +
+                            "#clear - 清空聊天记录\n" +
+                            "#openmsg 是否显示抢红包信息 参数1(开启) 0 or 1\n"+
+                            "#auto_packet - 关闭/开启自动抢红包 参数1(开启) 0 or 1\n"
                 )
                 return
             }
@@ -142,6 +150,12 @@ class ToolWindowContent(p: Project?) : JPanel() {
             }
             "#clear","#清空"-> {
                 oChat?.clear()
+                return
+            }
+            "#auto_packet","#自动打开"->{
+                val autoOpen=PropertiesComponent.getInstance().getBoolean("auto_open")
+                PropertiesComponent.getInstance().setValue("auto_open",!autoOpen)
+                oChat?.addInfoToOChat("auto_open", (!autoOpen).toString())
                 return
             }
         }
