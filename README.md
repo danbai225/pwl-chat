@@ -1,14 +1,14 @@
 # pwl-chat
 
 ![Build](https://github.com/danbai225/pwl-chat/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/com.github.danbai225.pwlchat.svg)](https://plugins.jetbrains.com/plugin/com.github.danbai225.pwlchat)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.github.danbai225.pwlchat.svg)](https://plugins.jetbrains.com/plugin/com.github.danbai225.pwlchat)
+[![Version](https://img.shields.io/jetbrains/plugin/v/com.github.danbai225.pwlchat.svg)](https://plugins.jetbrains.com/plugin/18091-pwl-chat)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/com.github.danbai225.pwlchat.svg)](https://plugins.jetbrains.com/plugin/18091-pwl-chat)
 
-## Template ToDo list
+
 ![image-56c2aad9](https://danbai.oss-accelerate.aliyuncs.com/bk/image-56c2aad9.png)
 <!-- Plugin description -->
 
-This is a connection [pwl](https://pwl.icu) chat plugin.
+This is a connection [pwl](https://fishpi.cn) chat plugin.
 
 Enter`#Help`ForHelp
 
@@ -28,7 +28,7 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
 
 `#clear` - ClearChatHistory
 
-这是一个连接[pwl](https://pwl.icu)聊天插件。
+这是一个连接[pwl](https://fishpi.cn/)聊天插件。
 
 输入`#help`获取帮助
 
@@ -63,7 +63,6 @@ HelpCommand：Command starts with `#` Parameters are separated by spaces
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
 ## 已知BUG
-
 
 ## TODO
 
