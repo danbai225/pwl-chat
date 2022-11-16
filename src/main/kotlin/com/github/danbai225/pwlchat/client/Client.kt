@@ -43,12 +43,11 @@ class Client {
     var black:Boolean=false
     private var ws: Ws? = null
     private var hotlineTimer =0
-    init {
+    private var loadoldmsg=false
+    fun ini(){
         load()
         verifyLogin()
-        if (isLogin){
-            connect()
-        }
+        connect()
         timer("定时Thread_name", false, 2000, 1000) {
             if (isLogin){
                 if (ws?.isClosed == true&&!black) {
@@ -61,19 +60,11 @@ class Client {
                 hotlineTimer++
                 if (hotlineTimer>1000){
                     hotlineTimer=0
-                    val get = get(PWL_LIVE)
-                    get?.execute().use { response ->
-                        if (response?.code() == 200) {
-                            val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
-                            onlineVitality = msg.liveness
-                            hot?.value= onlineVitality.toInt()
-                        }
-                    }
+                    hotline()
                 }
             }
         }
     }
-
     //加载持久数据
     private fun load() {
         PropertiesComponent.getInstance().getValue("pwl_userName").let {
@@ -150,7 +141,10 @@ class Client {
                     onlineVitality = msg.liveness
                     hot?.value= onlineVitality.toInt()
                     isLogin = true
-                    yesterdayReward()
+                    if (!loadoldmsg){
+                        yesterdayReward()
+                        loadoldmsg=true
+                    }
                     return true
                 }
             }
@@ -158,7 +152,16 @@ class Client {
         isLogin = false
         return false
     }
-
+    fun hotline(){
+        val get = get(PWL_LIVE)
+        get?.execute().use { response ->
+            if (response?.code() == 200) {
+                val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
+                onlineVitality = msg.liveness
+                hot?.value= onlineVitality.toInt()
+            }
+        }
+    }
     //发送红包
     fun packet(count: Int, money: Int, msg: String) {
         var mm = msg
@@ -318,7 +321,6 @@ class Client {
     }
 
     fun onMessage(message: String) {
-        //logger.info("received message: $message")
         val msg =
             Gson().fromJson(message, Msg::class.java)
         when (msg.type) {

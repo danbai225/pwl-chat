@@ -22,6 +22,7 @@ import java.util.*
 class WebChat : JBCefBrowser(), oChat {
     private var loadHistory:Boolean=false
     var clientApi:Client?=null
+    var init=false
     init {
         //初始化加载内容
         loadHTML(CSS + JS + HTML)
@@ -49,7 +50,7 @@ class WebChat : JBCefBrowser(), oChat {
             override fun onLoadEnd(browser: CefBrowser, frame: CefFrame, httpStatusCode: Int) {
                 //onLoadEnd 在加载iframe也会触发
                 //初次加载
-                if(browser.url.contains("about:blank")){
+                if(browser.url.contains("about:blank")&&!init){
                     clientApi?.more(1)
                     browser.executeJavaScript(
                         "window.openRedPacket = function(arg) {${openRedPacket.inject(
@@ -59,6 +60,7 @@ class WebChat : JBCefBrowser(), oChat {
                         )}};",
                         "https://fishpi.cn/js/openRedPacket.js", 0
                     )
+                    init=true
                 }
             }
         }, cefBrowser)

@@ -185,6 +185,7 @@ class ToolWindowContent(p: Project?) : JPanel() {
         client?.userLabel = userLabel
         client?.userlist=userlist
         client?.hot=hot
+        client?.ini()
         //其他
         draw?.add(testDraw())
         loginD()
