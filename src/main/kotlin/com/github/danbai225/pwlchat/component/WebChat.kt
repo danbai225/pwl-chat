@@ -64,13 +64,13 @@ class WebChat : JBCefBrowser(), oChat {
         }, cefBrowser)
     }
     //通过js加载添加html到web
+
     private fun addHtml(html: String) {
         val html2 = Base64.getEncoder().encodeToString(html.toByteArray())
         cefBrowser.executeJavaScript(
-            """$("#chat").append(decodeURIComponent(escape(window.atob('$html2')))); if ((${'$'}("#chat").height()-document.body.clientHeight-${'$'}(this).scrollTop())<333){window.scrollTo(0, ${'$'}("#chat").height())};""",
+            """$("#chat").append(decodeURIComponent(escape(window.atob('$html2')))); if ((${'$'}("#chat").height()-document.body.clientHeight-${'$'}(this).scrollTop())<333){window.scrollTo(0, ${'$'}("#chat").height())};var chats=${'$'}("#chat").children();if(chats.length>200){chats[0].remove();}""",
             "https://fishpi.cn/js/main.js",
-            0
-        )
+            0)
     }
 
     //消息类型分析组成添加到web

@@ -42,7 +42,7 @@ class Client {
     var oChat: oChat? = null
     var black:Boolean=false
     private var ws: Ws? = null
-
+    private var hotlineTimer =0
     init {
         load()
         verifyLogin()
@@ -56,6 +56,18 @@ class Client {
                     connect()
                     if (ws?.isClosed == false) {
                         oChat?.addInfoToOChat("ws", "连接已恢复")
+                    }
+                }
+                hotlineTimer++
+                if (hotlineTimer>1000){
+                    hotlineTimer=0
+                    val get = get(PWL_LIVE)
+                    get?.execute().use { response ->
+                        if (response?.code() == 200) {
+                            val msg = Gson().fromJson(response.body()?.string(), Liveness::class.java)
+                            onlineVitality = msg.liveness
+                            hot?.value= onlineVitality.toInt()
+                        }
                     }
                 }
             }
