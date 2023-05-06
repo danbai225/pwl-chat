@@ -180,7 +180,7 @@ class Client {
         GlobalScope.launch {
             val call = post(
                 PWL_SEND,
-                "{\"content\":\"$msg\"}"
+                "{\"content\":\"$msg\",\"client\":\"IDEA/0.3.0\"}"
             )
             try {
                 call?.execute().use {

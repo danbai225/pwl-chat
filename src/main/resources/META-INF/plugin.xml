@@ -4,9 +4,9 @@
     <name>Pwl-Chat</name>
     <vendor email="danbai@88.com" url="https://p00q.cn">DanBai</vendor>
     <description><![CDATA[
-   This is a [pwl](https://fishpi.cn) chat plugin.
+   This is a [fishpi](https://fishpi.cn) chat plugin.
 
-    这是一个连接[pwl](https://fishpi.cn)聊天插件。
+    这是一个连接[fishpi](https://fishpi.cn)聊天插件。
     ]]></description>
     <depends>com.intellij.modules.platform</depends>
     <extensions defaultExtensionNs="com.intellij">
