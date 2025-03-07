@@ -162,6 +162,16 @@ class Client {
             }
         }
     }
+    fun GetWSSUrl():String{
+        val get = get(PWL_GETWSS)
+        get?.execute().use { response ->
+            if (response?.code() == 200) {
+                val msg = Gson().fromJson(response.body()?.string(), Wss::class.java)
+                return msg.data.toString()
+            }
+        }
+        return ""
+    }
     //发送红包
     fun packet(count: Int, money: Int, msg: String) {
         var mm = msg
@@ -180,7 +190,7 @@ class Client {
         GlobalScope.launch {
             val call = post(
                 PWL_SEND,
-                "{\"content\":\"$msg\",\"client\":\"IDEA/0.3.0\"}"
+                "{\"content\":\"$msg\",\"client\":\"IDEA/0.3.1\"}"
             )
             try {
                 call?.execute().use {
@@ -315,7 +325,7 @@ class Client {
      */
     private fun connect() {
         if (isLogin){
-            ws = Ws(this,apiKey)
+            ws = Ws(this,GetWSSUrl())
             ws?.connect()
         }
     }
@@ -375,8 +385,8 @@ class Client {
      */
     //teyxBFF7JjkXHv
     companion object {
-        const val PWL_WSS = "wss://fishpi.cn/chat-room-channel"
         private const val PWL_LIVE = "https://fishpi.cn/user/liveness"
+        private const val PWL_GETWSS = "https://fishpi.cn/chat-room/node/get"
         private const val PWL_SEND = "https://fishpi.cn/chat-room/send"
         private const val PWL_OPEN = "https://fishpi.cn/chat-room/red-packet/open"
         private const val PWL_REVOKE = "https://fishpi.cn/chat-room/revoke/"

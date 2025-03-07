@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import java.net.URI
 import java.nio.ByteBuffer
 
-class Ws(c:Client,apikey:String) : WebSocketClient(URI.create(Client.PWL_WSS+"?apiKey=$apikey")) {
+class Ws(c:Client,apikey:String) : WebSocketClient(URI.create(apikey)) {
     var client: Client? = c
 
     override fun onOpen(handshakedata: ServerHandshake?) {
