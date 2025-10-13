@@ -7,11 +7,11 @@ plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.6.0"
+    id("org.jetbrains.kotlin.jvm") version "1.7.22"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.4.0"
+    id("org.jetbrains.intellij") version "1.10.0"
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "1.3.1"
+    id("org.jetbrains.changelog") version "2.0.0"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "0.1.13"
 }
@@ -76,6 +76,32 @@ tasks {
         gradleVersion = properties("gradleVersion")
     }
 
+    // Copy dependencies to plugin lib folder
+    prepareSandbox {
+        doLast {
+            val libDir = file("${destinationDir}/${intellij.pluginName.get()}/lib")
+            libDir.mkdirs()
+            configurations.runtimeClasspath.get().files.forEach { file ->
+                if (!file.name.contains("kotlin-stdlib") &&
+                    !file.name.contains("kotlin-reflect") &&
+                    !file.name.contains("annotations-")) {
+                    copy {
+                        from(file)
+                        into(libDir)
+                    }
+                }
+            }
+        }
+    }
+
+    // Also ensure buildPlugin includes the dependencies
+    buildPlugin {
+        doLast {
+            val pluginJar = file("${project.buildDir}/distributions/${project.name}-${project.version}.zip")
+            println("Plugin JAR created at: ${pluginJar.absolutePath}")
+        }
+    }
+
     patchPluginXml {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
@@ -96,9 +122,14 @@ tasks {
 
         // Get the latest available change notes from the changelog file
         changeNotes.set(provider {
-            changelog.run {
-                getOrNull(properties("pluginVersion")) ?: getLatest()
-            }.toHTML()
+            with(changelog) {
+                renderItem(
+                    (getOrNull(properties("pluginVersion")) ?: getLatest())
+                        .withHeader(false)
+                        .withEmptySections(false),
+                    org.jetbrains.changelog.Changelog.OutputType.HTML
+                )
+            }
         })
     }
 

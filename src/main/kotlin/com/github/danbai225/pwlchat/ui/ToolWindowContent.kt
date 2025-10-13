@@ -2,7 +2,6 @@ package com.github.danbai225.pwlchat.ui
 
 import com.github.danbai225.pwlchat.client.Client
 import com.github.danbai225.pwlchat.component.TextChat
-import com.github.danbai225.pwlchat.component.WebChat
 import com.github.danbai225.pwlchat.component.oChat
 import com.github.danbai225.pwlchat.draw.testDraw
 import com.github.danbai225.pwlchat.notify.sendNotify
@@ -44,7 +43,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
     var userlist: JList<String>? = null
     private var project: Project? = p
     private var history: ArrayDeque<String> = ArrayDeque(4)
-    private var WebView: Boolean = false
     private fun sendNotify(title: String, content: String, type: NotificationType) {
         project?.let { sendNotify(it, title, content, type) }
     }
@@ -80,7 +78,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
                             "#revoke - 撤回最后一条发送的消息\n" +
                             "#exit - 退出登陆\n" +
                             "#eventLog - 在事件中输出聊天 参数1(是否开启1 or 0)\n" +
-                            "#web - 切换输出模式 参数1(开启) 0 or 1\n" +
                             "#clear - 清空聊天记录\n" +
                             "#openmsg 是否显示抢红包信息 参数1(开启) 0 or 1\n"+
                             "#auto_packet - 关闭/开启自动抢红包 参数1(开启) 0 or 1\n"
@@ -117,29 +114,6 @@ class ToolWindowContent(p: Project?) : JPanel() {
                 client?.save()
                 return
             }
-            "#web" -> {
-                if (split.size<2||split[1].isEmpty()){
-                    oChat?.addInfoToOChat("commandLineInfo","参数有误请输入#help查看帮助")
-                    return
-                }
-                PropertiesComponent.getInstance().setValue("pwl_web", split[1].toInt() == 1)
-                if ((split[1].toInt() == 1) != WebView) {
-                    WebView = (split[1].toInt() == 1)
-                    var chat: oChat = if (WebView) {
-                        WebChat()
-                    } else {
-                        TextChat()
-                    }
-                    if (oChat!=null){
-                        oChat?.close()
-                    }
-                    oChat = chat
-                    oChatPanel?.removeAll()
-                    oChatPanel?.add(chat.getComponent(),BorderLayout.CENTER)
-                    client?.setOChatApi(oChat!!)
-                }
-                return
-            }
             "#openmsg"-> {
                 if (split.size<2||split[1].isEmpty()){
                     oChat?.addInfoToOChat("#openmsg","参数有误请输入#help查看帮助")
@@ -166,18 +140,10 @@ class ToolWindowContent(p: Project?) : JPanel() {
         //自身属性
         layout = BorderLayout()
         root?.let { add(it, BorderLayout.CENTER) }
-        //聊天渲染
-        PropertiesComponent.getInstance().getBoolean("pwl_web").let {
-            WebView = it
-        }
-        val chat: oChat = if (WebView) {
-            WebChat()
-        } else {
-            TextChat()
-        }
-        oChat = chat
+        //聊天渲染 - 使用文本模式
+        oChat = TextChat()
         oChatPanel?.removeAll()
-        oChatPanel?.add(chat.getComponent(),BorderLayout.CENTER)
+        oChatPanel?.add(oChat!!.getComponent(),BorderLayout.CENTER)
         client?.setOChatApi(oChat!!)
         //pwl客户端
         client?.project = project
